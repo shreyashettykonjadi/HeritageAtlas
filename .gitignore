@@ -46,6 +46,7 @@ coverage/
 Thumbs.db
 Desktop.ini
 $RECYCLE.BIN/
+docs/
 
 # ========================
 # Misc
@@ -54,3 +55,4 @@ $RECYCLE.BIN/
 *.tgz
 *.pid
 *.seed
+ 
