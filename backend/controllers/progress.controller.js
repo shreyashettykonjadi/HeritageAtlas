@@ -68,7 +68,7 @@ export async function createOrUpdateProgress(req, res) {
     const updated = await UserProgress.findOneAndUpdate(
       { userId, placeId },
       { $set: updatedState },
-      { new: true, upsert: true, runValidators: true }
+      { returnDocument: "after", upsert: true, runValidators: true }
     );
 
     return res.status(200).json(updated);
