@@ -9,6 +9,7 @@
   "keywords": [],
   "author": "Shreya Shetty",
   "license": "MIT",
+  "type":"module",
   "description": "Heritage Atlas Backend",
   "dependencies": {
     "cors": "^2.8.6",
