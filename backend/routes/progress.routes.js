@@ -4,8 +4,11 @@ import {
   getUserProgress,
   getSingleProgress,
 } from "../controllers/progress.controller.js";
+import { requireAnonymousId } from "../middleware/anonymous.middleware.js";
 
 const router = express.Router();
+
+router.use(requireAnonymousId);
 
 // Get all progress for current user
 router.get("/", getUserProgress);

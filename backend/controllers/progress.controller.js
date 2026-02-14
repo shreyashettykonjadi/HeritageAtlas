@@ -3,12 +3,8 @@ import UserProgress from "../models/UserProgress.js";
 // POST /progress
 export async function createOrUpdateProgress(req, res) {
   try {
-    const userId = req.headers["anonymous-id"];
+    const userId = req.userId;
     const { placeId } = req.body;
-
-    if (!userId || userId.trim() === "") {
-      return res.status(400).json({ message: "anonymous-id header is required" });
-    }
 
     if (!placeId) {
       return res.status(400).json({ message: "placeId is required" });
@@ -85,11 +81,7 @@ export async function createOrUpdateProgress(req, res) {
 // GET /progress
 export async function getUserProgress(req, res) {
   try {
-    const userId = req.headers["anonymous-id"];
-
-    if (!userId || userId.trim() === "") {
-      return res.status(400).json({ message: "anonymous-id header is required" });
-    }
+    const userId = req.userId;
 
     const progress = await UserProgress.find({ userId });
 
@@ -100,16 +92,11 @@ export async function getUserProgress(req, res) {
   }
 }
 
-
 // GET /progress/:placeId
 export async function getSingleProgress(req, res) {
   try {
-    const userId = req.headers["anonymous-id"];
+    const userId = req.userId;
     const { placeId } = req.params;
-
-    if (!userId || userId.trim() === "") {
-      return res.status(400).json({ message: "anonymous-id header is required" });
-    }
 
     if (!placeId) {
       return res.status(400).json({ message: "placeId is required" });
