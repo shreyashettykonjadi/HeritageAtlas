@@ -1,42 +1,77 @@
 import UserProgress from "../models/UserProgress.js";
 
+// POST /progress
 export async function createOrUpdateProgress(req, res) {
   try {
-    const { userId, placeId, bucket, rating, notes, visitDate } = req.body;
-    let { visited } = req.body;
+    const userId = req.headers["anonymous-id"];
+    const { placeId } = req.body;
 
-    // Required fields
-    if (!userId || !placeId) {
-      return res.status(400).json({ message: "userId and placeId are required" });
+    if (!userId || userId.trim() === "") {
+      return res.status(400).json({ message: "anonymous-id header is required" });
     }
 
-    // Normalize visited based on visitDate
-    if (visitDate) {
-      visited = true;
+    if (!placeId) {
+      return res.status(400).json({ message: "placeId is required" });
     }
 
-    if (visited === undefined) {
-      visited = false;
+    // Fetch existing record (if any)
+    const existing = await UserProgress.findOne({ userId, placeId });
+
+    // Start from existing values if present
+    const current = existing ? existing.toObject() : {};
+
+    // Build updated state by merging
+    const updatedState = {
+      visited: current.visited || false,
+      bucket: current.bucket || false,
+      rating: current.rating,
+      notes: current.notes,
+      visitDate: current.visitDate,
+    };
+
+    // Apply incoming fields only if defined
+    if ("visited" in req.body) {
+      updatedState.visited = req.body.visited;
+    }
+
+    if ("bucket" in req.body) {
+      updatedState.bucket = req.body.bucket;
+    }
+
+    if ("rating" in req.body) {
+      updatedState.rating = req.body.rating;
+    }
+
+    if ("notes" in req.body) {
+      updatedState.notes = req.body.notes;
+    }
+
+    if ("visitDate" in req.body) {
+        updatedState.visitDate = req.body.visitDate;
+
+        if (req.body.visitDate) {
+            updatedState.visited = true;
+        }
     }
 
     // Determine if record is empty
     const isEmpty =
-      visited === false &&
-      bucket !== true &&
-      rating === undefined &&
-      (!notes || notes.trim() === "") &&
-      !visitDate;
+        updatedState.visited === false &&
+        updatedState.bucket !== true &&
+        (updatedState.rating === undefined || updatedState.rating === null) &&
+        (!updatedState.notes || updatedState.notes.trim() === "") &&
+        !updatedState.visitDate;
 
-    // Delete instead of upsert if empty
+
     if (isEmpty) {
       await UserProgress.findOneAndDelete({ userId, placeId });
       return res.status(200).json({ message: "Progress removed" });
     }
 
-    // Upsert logic
+    // Upsert with $set
     const updated = await UserProgress.findOneAndUpdate(
       { userId, placeId },
-      { visited, bucket, rating, notes, visitDate },
+      { $set: updatedState },
       { new: true, upsert: true, runValidators: true }
     );
 
@@ -47,12 +82,13 @@ export async function createOrUpdateProgress(req, res) {
   }
 }
 
+// GET /progress
 export async function getUserProgress(req, res) {
   try {
-    const { userId } = req.params;
+    const userId = req.headers["anonymous-id"];
 
-    if (!userId) {
-      return res.status(400).json({ message: "userId is required" });
+    if (!userId || userId.trim() === "") {
+      return res.status(400).json({ message: "anonymous-id header is required" });
     }
 
     const progress = await UserProgress.find({ userId });
@@ -64,12 +100,19 @@ export async function getUserProgress(req, res) {
   }
 }
 
+
+// GET /progress/:placeId
 export async function getSingleProgress(req, res) {
   try {
-    const { userId, placeId } = req.params;
+    const userId = req.headers["anonymous-id"];
+    const { placeId } = req.params;
 
-    if (!userId || !placeId) {
-      return res.status(400).json({ message: "userId and placeId are required" });
+    if (!userId || userId.trim() === "") {
+      return res.status(400).json({ message: "anonymous-id header is required" });
+    }
+
+    if (!placeId) {
+      return res.status(400).json({ message: "placeId is required" });
     }
 
     const progress = await UserProgress.findOne({ userId, placeId });
@@ -84,4 +127,3 @@ export async function getSingleProgress(req, res) {
     return res.status(500).json({ message: error.message });
   }
 }
-

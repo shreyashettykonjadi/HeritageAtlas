@@ -7,13 +7,13 @@ import {
 
 const router = express.Router();
 
-// More specific route first
-router.get("/:userId/:placeId", getSingleProgress);
+// Get all progress for current user
+router.get("/", getUserProgress);
 
-// Less specific route after
-router.get("/:userId", getUserProgress);
+// Get single place progress for current user
+router.get("/:placeId", getSingleProgress);
 
-// POST upsert route
+// Create or update progress
 router.post("/", createOrUpdateProgress);
 
 export default router;
