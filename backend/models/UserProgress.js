@@ -37,7 +37,7 @@ const userProgressSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Prevent duplicate progress per user per place
+// Prevent duplicate progress per user per place compound index key
 userProgressSchema.index(
   { userId: 1, placeId: 1 },
   { unique: true }
