@@ -20,8 +20,12 @@ export default function MapPage() {
   }, [])
 
   return (
-    <div className="h-screen w-full">
-      <div id="map" className="h-full w-full"></div>
+  <div className="px-6 pb-10">
+    <div className="max-w-7xl mx-auto mt-6">
+      <div className="h-[75vh] rounded-2xl overflow-hidden shadow-lg">
+        <div id="map" className="h-full w-full"></div>
+      </div>
     </div>
-  )
+  </div>
+)
 }
