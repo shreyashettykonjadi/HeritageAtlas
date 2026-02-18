@@ -13,26 +13,38 @@ export default function MapPage() {
   const markersRef = useRef(null)
 
   useEffect(function () {
-  const map = L.map("map", {
-    minZoom: 2,
-    maxZoom: 8,
-    worldCopyJump: true,
-  }).setView([20, 0], 2)
+    // defined bounds for the world
+    const southWest = L.latLng(-85, -180)
+    const northEast = L.latLng(85, 180)
+    const bounds = L.latLngBounds(southWest, northEast)
 
-  L.tileLayer(
-    "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-    {
-      attribution: "&copy; OpenStreetMap & CARTO",
+    const map = L.map("map", {
+      minZoom: 2,
+      maxZoom: 8,
+      maxBounds: bounds,         // Restrict panning to world
+      maxBoundsViscosity: 1.0,   // "Solid" elastic bounce-back
+      worldCopyJump: false,      // Disable jumping to cached world copies
+    })
+
+    // Fit to world view initially
+    map.fitBounds(bounds)
+
+    L.tileLayer(
+      "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+      {
+        attribution: "&copy; OpenStreetMap & CARTO",
+        noWrap: true,            // Stop tiles from repeating horizontally
+        bounds: bounds,          // Tell tiles not to load outside world
+      }
+    ).addTo(map)
+
+    mapRef.current = map
+    markersRef.current = L.layerGroup().addTo(map)
+
+    return function () {
+      map.remove()
     }
-  ).addTo(map)
-
-  mapRef.current = map
-  markersRef.current = L.layerGroup().addTo(map)
-
-  return function () {
-    map.remove()
-  }
-}, [])
+  }, [])
 
   useEffect(function () {   // Enable/disable map interactions based on whether a site is selected
     if (!mapRef.current) return
@@ -129,14 +141,18 @@ export default function MapPage() {
       </div>
 
       {/* Map Card */}
-      <div className="flex-1 w-full min-h-0 relative rounded-3xl overflow-hidden shadow-[0_20px_50px_-12px_rgba(27,68,54,0.25)] border-4 border-[#FDF6E3]/60 ring-1 ring-[#1B4436]/5">
-        <div id="map" className="h-full w-full bg-[#E5E0D8]"></div>
+      <div className="flex-1 w-full min-h-0 relative rounded-3xl overflow-hidden shadow-[0_25px_50px_-12px_rgba(27,68,54,0.3)] border-[6px] border-[#FDF6E3] ring-1 ring-[#1B4436]/10"
+           style={{ background: "#CDD2D4" }}> {/* Matched CartoDB Light water color */}
+        <div id="map" className="h-full w-full bg-transparent isolate"></div>
+        
+        {/* Subtle inner texture/vignette overlay */}
+        <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_40px_rgba(27,68,54,0.1)] rounded-2xl z-400" />
       </div>
 
       {/* Overlay */}
       {selectedSite && (
         <div
-          className="fixed inset-0 bg-[#1B4436]/20 backdrop-blur-[2px] z-[900] transition-opacity duration-300"
+          className="fixed inset-0 bg-[#1B4436]/20 backdrop-blur-[2px] z-900 transition-opacity duration-300"
           onClick={() => setSelectedSite(null)}
         />
       )}
