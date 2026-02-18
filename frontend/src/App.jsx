@@ -7,7 +7,7 @@ import MyJourney from "./pages/MyJourney.jsx"
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="h-screen overflow-hidden bg-[#F9E4C5] flex flex-col">
+      <div className="h-screen overflow-hidden bg-[#FBF3E4] flex flex-col">
         <Navbar />
 
         <div className="flex-1 pt-16 min-h-0">

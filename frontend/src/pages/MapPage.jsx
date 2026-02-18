@@ -121,29 +121,29 @@ export default function MapPage() {
   }
 
   return (
-    <div className="h-full overflow-y-auto">
-      <div className="max-w-6xl mx-auto px-4 sm:px-8 lg:px-12 py-6 sm:py-10">
-        <div className="flex justify-center mb-6 sm:mb-8">
-          <MapModeToggle mapMode={mapMode} setMapMode={setMapMode} />
-        </div>
-        <div className="h-[52vh] sm:h-[62vh] lg:h-[68vh] rounded-2xl overflow-hidden shadow-2xl">
-          <div id="map" className="h-full w-full"></div>
-        </div>
+    <div className="h-full w-full flex flex-col px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+      
+      {/* Header Controls */}
+      <div className="flex-none flex items-center justify-between mb-4">
+        <MapModeToggle mapMode={mapMode} setMapMode={setMapMode} />
       </div>
+
+      {/* Map Card */}
+      <div className="flex-1 w-full min-h-0 relative rounded-3xl overflow-hidden shadow-[0_20px_50px_-12px_rgba(27,68,54,0.25)] border-4 border-[#FDF6E3]/60 ring-1 ring-[#1B4436]/5">
+        <div id="map" className="h-full w-full bg-[#E5E0D8]"></div>
+      </div>
+
+      {/* Overlay */}
       {selectedSite && (
         <div
-          className="fixed inset-0 bg-black/30 z-[900]"
-          onClick={function () {
-            setSelectedSite(null)
-          }}
+          className="fixed inset-0 bg-[#1B4436]/20 backdrop-blur-[2px] z-[900] transition-opacity duration-300"
+          onClick={() => setSelectedSite(null)}
         />
       )}
 
       <SidePanel
         site={selectedSite}
-        onClose={function () {
-          setSelectedSite(null)
-        }}
+        onClose={() => setSelectedSite(null)}
       />
     </div>
   )
