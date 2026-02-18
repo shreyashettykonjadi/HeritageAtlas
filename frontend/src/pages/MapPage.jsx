@@ -14,37 +14,28 @@ export default function MapPage() {
   const markersRef = useRef(null)
 
   useEffect(function () {
-    const worldBounds = [
-      [-85, -180],
-      [85, 180],
-    ]
+  const map = L.map("map", {
+    minZoom: 2,
+    maxZoom: 8,
+    worldCopyJump: true,
+  }).setView([20, 0], 2)
 
-    const map = L.map("map", {
-      maxZoom: 8,
-      minZoom: 2,
-      worldCopyJump: false,
-      maxBounds: worldBounds,
-      maxBoundsViscosity: 1.0,
-    })
-
-    L.tileLayer(
-      "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
-      {
-        attribution: "&copy; OpenStreetMap & CARTO",
-      }
-    ).addTo(map)
-
-
-    map.fitBounds(worldBounds)
-    map.setMaxBounds(worldBounds)
-
-    mapRef.current = map
-    markersRef.current = L.layerGroup().addTo(map)
-
-    return function () {
-      map.remove()
+  L.tileLayer(
+    "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+    {
+      attribution: "&copy; OpenStreetMap & CARTO",
     }
-  }, [])
+  ).addTo(map)
+
+  mapRef.current = map
+  markersRef.current = L.layerGroup().addTo(map)
+
+  return function () {
+    map.remove()
+  }
+}, [])
+
+
 
 
   useEffect(function () {   // Enable/disable map interactions based on whether a site is selected
@@ -138,7 +129,7 @@ export default function MapPage() {
 
 
   return (
-    <div className="px-6 pb-10">
+    <div className="h-[calc(100vh-64px)] w-full">
       <div className="max-w-7xl mx-auto mt-6">
         <MapModeToggle mapMode={mapMode} setMapMode={setMapMode} />
         <div className="h-[75vh] rounded-2xl overflow-hidden shadow-lg">
