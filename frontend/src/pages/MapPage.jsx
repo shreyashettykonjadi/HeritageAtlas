@@ -28,13 +28,12 @@ export default function MapPage() {
     })
 
     L.tileLayer(
-      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
       {
-        attribution: "&copy; OpenStreetMap contributors",
-        noWrap: true,
-        bounds: worldBounds,
+        attribution: "&copy; OpenStreetMap & CARTO",
       }
     ).addTo(map)
+
 
     map.fitBounds(worldBounds)
     map.setMaxBounds(worldBounds)
