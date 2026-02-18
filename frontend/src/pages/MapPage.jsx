@@ -13,32 +13,50 @@ export default function MapPage() {
   const mapRef = useRef(null)
   const markersRef = useRef(null)
 
-  useEffect(function () {   // Initialize map on component mount
-    const map = L.map("map").setView([20, 0], 2)
-    mapRef.current = map
+  useEffect(function () {
+    const worldBounds = [
+      [-85, -180],
+      [85, 180],
+    ]
+
+    const map = L.map("map", {
+      maxZoom: 8,
+      minZoom: 2,
+      worldCopyJump: false,
+      maxBounds: worldBounds,
+      maxBoundsViscosity: 1.0,
+    })
 
     L.tileLayer(
       "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
       {
         attribution: "&copy; OpenStreetMap contributors",
+        noWrap: true,
+        bounds: worldBounds,
       }
     ).addTo(map)
 
+    map.fitBounds(worldBounds)
+    map.setMaxBounds(worldBounds)
+
+    mapRef.current = map
     markersRef.current = L.layerGroup().addTo(map)
+
     return function () {
       map.remove()
     }
   }, [])
 
-  useEffect(function () {   // Enable/disable map interactions based on whether a site is selected
-  if (!mapRef.current) return
 
-  if (selectedSite) {
-    setMapInteractionState(mapRef.current, false)
-  } else {
-    setMapInteractionState(mapRef.current, true)
-  }
-}, [selectedSite])
+  useEffect(function () {   // Enable/disable map interactions based on whether a site is selected
+    if (!mapRef.current) return
+
+    if (selectedSite) {
+      setMapInteractionState(mapRef.current, false)
+    } else {
+      setMapInteractionState(mapRef.current, true)
+    }
+  }, [selectedSite])
 
 
 
@@ -76,48 +94,48 @@ export default function MapPage() {
   }, [mapMode])
 
   function setMapInteractionState(map, isEnabled) {
-  if (!map) return
+    if (!map) return
 
-  if (isEnabled) {
-    map.dragging.enable()
-    map.scrollWheelZoom.enable()
-    map.doubleClickZoom.enable()
-    map.boxZoom.enable()
-    map.keyboard.enable()
-    map.touchZoom.enable()
-    map.zoomControl.enable()
-  } else {
-    map.dragging.disable()
-    map.scrollWheelZoom.disable()
-    map.doubleClickZoom.disable()
-    map.boxZoom.disable()
-    map.keyboard.disable()
-    map.touchZoom.disable()
-    map.zoomControl.disable()
+    if (isEnabled) {
+      map.dragging.enable()
+      map.scrollWheelZoom.enable()
+      map.doubleClickZoom.enable()
+      map.boxZoom.enable()
+      map.keyboard.enable()
+      map.touchZoom.enable()
+      map.zoomControl.enable()
+    } else {
+      map.dragging.disable()
+      map.scrollWheelZoom.disable()
+      map.doubleClickZoom.disable()
+      map.boxZoom.disable()
+      map.keyboard.disable()
+      map.touchZoom.disable()
+      map.zoomControl.disable()
+    }
   }
-}
 
   function setMapInteractionState(map, isEnabled) {
-  if (!map) return
+    if (!map) return
 
-  if (isEnabled) {
-    map.dragging.enable()
-    map.scrollWheelZoom.enable()
-    map.doubleClickZoom.enable()
-    map.boxZoom.enable()
-    map.keyboard.enable()
-    map.touchZoom.enable()
-    map.zoomControl.enable()
-  } else {
-    map.dragging.disable()
-    map.scrollWheelZoom.disable()
-    map.doubleClickZoom.disable()
-    map.boxZoom.disable()
-    map.keyboard.disable()
-    map.touchZoom.disable()
-    map.zoomControl.disable()
+    if (isEnabled) {
+      map.dragging.enable()
+      map.scrollWheelZoom.enable()
+      map.doubleClickZoom.enable()
+      map.boxZoom.enable()
+      map.keyboard.enable()
+      map.touchZoom.enable()
+      map.zoomControl.enable()
+    } else {
+      map.dragging.disable()
+      map.scrollWheelZoom.disable()
+      map.doubleClickZoom.disable()
+      map.boxZoom.disable()
+      map.keyboard.disable()
+      map.touchZoom.disable()
+      map.zoomControl.disable()
+    }
   }
-}
 
 
   return (
