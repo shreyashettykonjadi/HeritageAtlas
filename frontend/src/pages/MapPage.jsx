@@ -30,19 +30,16 @@ export default function MapPage() {
     }
   }, [])
 
-  useEffect(function () {   // Disable map interactions when side panel is open
-    if (!mapRef.current) return
+  useEffect(function () {   // Enable/disable map interactions based on whether a site is selected
+  if (!mapRef.current) return
 
-    if (selectedSite) {
-      mapRef.current.dragging.disable()
-      mapRef.current.scrollWheelZoom.disable()
-      mapRef.current.doubleClickZoom.disable()
-    } else {
-      mapRef.current.dragging.enable()
-      mapRef.current.scrollWheelZoom.enable()
-      mapRef.current.doubleClickZoom.enable()
-    }
-  }, [selectedSite])
+  if (selectedSite) {
+    setMapInteractionState(mapRef.current, false)
+  } else {
+    setMapInteractionState(mapRef.current, true)
+  }
+}, [selectedSite])
+
 
 
 
@@ -77,6 +74,50 @@ export default function MapPage() {
         })
     })
   }, [mapMode])
+
+  function setMapInteractionState(map, isEnabled) {
+  if (!map) return
+
+  if (isEnabled) {
+    map.dragging.enable()
+    map.scrollWheelZoom.enable()
+    map.doubleClickZoom.enable()
+    map.boxZoom.enable()
+    map.keyboard.enable()
+    map.touchZoom.enable()
+    map.zoomControl.enable()
+  } else {
+    map.dragging.disable()
+    map.scrollWheelZoom.disable()
+    map.doubleClickZoom.disable()
+    map.boxZoom.disable()
+    map.keyboard.disable()
+    map.touchZoom.disable()
+    map.zoomControl.disable()
+  }
+}
+
+  function setMapInteractionState(map, isEnabled) {
+  if (!map) return
+
+  if (isEnabled) {
+    map.dragging.enable()
+    map.scrollWheelZoom.enable()
+    map.doubleClickZoom.enable()
+    map.boxZoom.enable()
+    map.keyboard.enable()
+    map.touchZoom.enable()
+    map.zoomControl.enable()
+  } else {
+    map.dragging.disable()
+    map.scrollWheelZoom.disable()
+    map.doubleClickZoom.disable()
+    map.boxZoom.disable()
+    map.keyboard.disable()
+    map.touchZoom.disable()
+    map.zoomControl.disable()
+  }
+}
 
 
   return (
