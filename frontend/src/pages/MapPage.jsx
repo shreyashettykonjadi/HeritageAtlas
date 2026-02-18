@@ -5,7 +5,6 @@ import unescoSites from "../data/unesco"
 import MapModeToggle from "../components/MapModeToggle"
 import SidePanel from "../components/SidePanel"
 
-
 export default function MapPage() {
 
   const [mapMode, setMapMode] = useState("categories")
@@ -35,9 +34,6 @@ export default function MapPage() {
   }
 }, [])
 
-
-
-
   useEffect(function () {   // Enable/disable map interactions based on whether a site is selected
     if (!mapRef.current) return
 
@@ -47,9 +43,6 @@ export default function MapPage() {
       setMapInteractionState(mapRef.current, true)
     }
   }, [selectedSite])
-
-
-
 
   useEffect(function () {   // Update markers whenever mapMode changes to different color coding
     if (!markersRef.current) return
@@ -127,12 +120,13 @@ export default function MapPage() {
     }
   }
 
-
   return (
-    <div className="h-[calc(100vh-64px)] w-full">
-      <div className="max-w-7xl mx-auto mt-6">
-        <MapModeToggle mapMode={mapMode} setMapMode={setMapMode} />
-        <div className="h-[75vh] rounded-2xl overflow-hidden shadow-lg">
+    <div className="h-full overflow-y-auto">
+      <div className="max-w-6xl mx-auto px-4 sm:px-8 lg:px-12 py-6 sm:py-10">
+        <div className="flex justify-center mb-6 sm:mb-8">
+          <MapModeToggle mapMode={mapMode} setMapMode={setMapMode} />
+        </div>
+        <div className="h-[52vh] sm:h-[62vh] lg:h-[68vh] rounded-2xl overflow-hidden shadow-2xl">
           <div id="map" className="h-full w-full"></div>
         </div>
       </div>
