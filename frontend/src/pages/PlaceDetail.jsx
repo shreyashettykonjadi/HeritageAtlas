@@ -32,7 +32,7 @@ export default function PlaceDetail() {
   return (
     <div className="min-h-screen bg-white pb-20">
       {/* Hero Section */}
-      <div className="w-full h-[40vh] sm:h-[50vh] bg-gradient-to-br from-[#1B4436] to-[#2C5E4F] relative shadow-lg">
+      <div className="w-full h-[40vh] sm:h-[50vh] bg-linear-to-br from-[#1B4436] to-[#2C5E4F] relative shadow-lg">
         <div className="absolute inset-0 bg-black/20" />
         <div className="absolute bottom-0 left-0 w-full p-6 sm:p-10 lg:p-16 max-w-6xl mx-auto">
           <Link

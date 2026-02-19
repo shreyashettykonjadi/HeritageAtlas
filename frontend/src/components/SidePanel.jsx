@@ -42,7 +42,7 @@ export default function SidePanel({ site, onClose }) {
     <>
       {/* Backdrop for mobile (optional relative to design, but good for focus) */}
       <div 
-        className={`fixed inset-0 bg-black/20 backdrop-blur-sm z-[999] transition-opacity duration-300 sm:hidden
+        className={`fixed inset-0 bg-black/20 backdrop-blur-sm z-999 transition-opacity duration-300 sm:hidden
           ${isVisible ? "opacity-100" : "opacity-0 pointer-events-none"}
         `}
         onClick={handleClose}
@@ -50,11 +50,11 @@ export default function SidePanel({ site, onClose }) {
 
       <aside
         className={`
-          fixed z-[1000] bg-white shadow-2xl transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]
+          fixed z-1000 bg-white shadow-2xl transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]
           w-full bottom-0 left-0 rounded-t-3xl border-t border-gray-100
           sm:top-4 sm:right-4 sm:left-auto sm:bottom-4
-          sm:h-[calc(100vh-2rem)] sm:w-[400px] 
-          sm:rounded-2xl sm:border border-gray-200
+          sm:h-[calc(100vh-2rem)] sm:w-100 
+          sm:rounded-2xl sm:border
           overflow-hidden
           ${isVisible ? "translate-y-0 sm:translate-x-0" : "translate-y-full sm:translate-x-[110%]"}
         `}
@@ -78,7 +78,7 @@ export default function SidePanel({ site, onClose }) {
           </div>
 
           {/* Hero / Cover (Use map placeholder or gradient if no image) */}
-          <div className="h-32 bg-linear-to-br from-[#1B4436] to-[#2C5E4F] relative flex-shrink-0">
+          <div className="h-32 bg-linear-to-br from-[#1B4436] to-[#2C5E4F] relative shrink-0">
             <div className="absolute bottom-4 left-6 text-white/90 text-xs font-medium tracking-widest uppercase opacity-80">
               Unesco World Heritage
             </div>
