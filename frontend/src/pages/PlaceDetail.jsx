@@ -73,7 +73,7 @@ export default function PlaceDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-white pb-20">
+    <div className="flex flex-col bg-white pb-20">
       {/* Hero Section */}
       <div className="w-full h-[40vh] sm:h-[50vh] bg-linear-to-br from-[#1B4436] to-[#2C5E4F] relative shadow-lg">
         <div className="absolute inset-0 bg-black/20" />
@@ -95,7 +95,7 @@ export default function PlaceDetail() {
 
       {/* Content Container */}
       <div className="max-w-4xl mx-auto px-6 sm:px-10 lg:px-12 -mt-10 relative z-10">
-        <div className="bg-white rounded-3xl shadow-xl p-8 sm:p-12 border border-gray-100">
+        <div className="bg-white rounded-3xl shadow-xl p-8 sm:p-12 border-4 border-red-500">
 
           {/* Metadata Bar */}
           <div className="flex flex-wrap items-center gap-4 mb-8 pb-8 border-b border-gray-100">

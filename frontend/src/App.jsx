@@ -10,7 +10,7 @@ export default function App() {
       <div className="min-h-screen flex flex-col bg-[#FBF3E4]">
         <Navbar />
 
-        <main className="flex-1 flex flex-col pt-16 min-h-0">
+        <main className="flex-1 flex flex-col">
           <Routes>
             <Route path="/" element={<MapPage />} />
             <Route path="/place/:id" element={<PlaceDetail />} />
