@@ -7,16 +7,16 @@ import MyJourney from "./pages/MyJourney.jsx"
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="h-screen overflow-hidden bg-[#FBF3E4] flex flex-col">
+      <div className="min-h-screen flex flex-col bg-[#FBF3E4]">
         <Navbar />
 
-        <div className="flex-1 pt-16 min-h-0">
+        <main className="flex-1 flex flex-col pt-16 min-h-0">
           <Routes>
             <Route path="/" element={<MapPage />} />
             <Route path="/place/:id" element={<PlaceDetail />} />
             <Route path="/my-journey" element={<MyJourney />} />
           </Routes>
-        </div>
+        </main>
       </div>
     </BrowserRouter>
   )

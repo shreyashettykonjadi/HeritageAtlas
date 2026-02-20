@@ -96,7 +96,7 @@ export async function getUserProgress(req, res) {
 export async function getSingleProgress(req, res) {
   try {
     const userId = req.userId;
-    const { placeId } = req.params;
+    const placeId = req.params.placeId;
 
     if (!placeId) {
       return res.status(400).json({ message: "placeId is required" });
@@ -104,13 +104,11 @@ export async function getSingleProgress(req, res) {
 
     const progress = await UserProgress.findOne({ userId, placeId });
 
-    if (!progress) {
-      return res.status(404).json({ message: "Progress not found" });
-    }
-
-    return res.status(200).json(progress);
+    // IMPORTANT: return null if not found (NOT 404)
+    return res.status(200).json(progress || null);
 
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 }
+

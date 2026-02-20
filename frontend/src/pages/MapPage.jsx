@@ -9,10 +9,10 @@ export default function MapPage() {
 
   const [mapMode, setMapMode] = useState("categories")
   const [selectedSite, setSelectedSite] = useState(null)
-  const mapRef = useRef(null)
+  const mapRef = useRef(null)   
   const markersRef = useRef(null)
 
-  useEffect(function () {
+  useEffect(function () {   // Initialize map on first load with custom settings to restrict panning/zooming to world and prevent tile wrapping/repetition
     // defined bounds for the world
     const southWest = L.latLng(-85, -180)
     const northEast = L.latLng(85, 180)
@@ -88,29 +88,7 @@ export default function MapPage() {
     })
   }, [mapMode])
 
-  function setMapInteractionState(map, isEnabled) {
-    if (!map) return
-
-    if (isEnabled) {
-      map.dragging.enable()
-      map.scrollWheelZoom.enable()
-      map.doubleClickZoom.enable()
-      map.boxZoom.enable()
-      map.keyboard.enable()
-      map.touchZoom.enable()
-      map.zoomControl.enable()
-    } else {
-      map.dragging.disable()
-      map.scrollWheelZoom.disable()
-      map.doubleClickZoom.disable()
-      map.boxZoom.disable()
-      map.keyboard.disable()
-      map.touchZoom.disable()
-      map.zoomControl.disable()
-    }
-  }
-
-  function setMapInteractionState(map, isEnabled) {
+  function setMapInteractionState(map, isEnabled) {   // Enable/disable all map interactions (called when opening/closing side panel)
     if (!map) return
 
     if (isEnabled) {
@@ -133,7 +111,7 @@ export default function MapPage() {
   }
 
   return (
-    <div className="h-full w-full flex flex-col px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+    <div className="flex flex-col flex-1 min-h-0 px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
       
       {/* Header Controls */}
       <div className="flex-none flex items-center justify-between mb-4">
@@ -141,12 +119,12 @@ export default function MapPage() {
       </div>
 
       {/* Map Card */}
-      <div className="flex-1 w-full min-h-0 relative rounded-3xl overflow-hidden shadow-[0_25px_50px_-12px_rgba(27,68,54,0.3)] border-[6px] border-[#FDF6E3] ring-1 ring-[#1B4436]/10"
-           style={{ background: "#CDD2D4" }}> {/* Matched CartoDB Light water color */}
-        <div id="map" className="h-full w-full bg-transparent isolate"></div>
+      <div className="flex-1 min-h-0 relative rounded-3xl overflow-hidden shadow-[0_25px_50px_-12px_rgba(27,68,54,0.3)] border-[6px] border-[#FDF6E3] ring-1 ring-[#1B4436]/10"
+           style={{ background: "#CDD2D4" }}>
+        <div id="map" className="absolute inset-0"></div>
         
         {/* Subtle inner texture/vignette overlay */}
-        <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_40px_rgba(27,68,54,0.1)] rounded-2xl z-400" />
+        <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_40px_rgba(27,68,54,0.1)] rounded-2xl z-[400]" />
       </div>
 
       {/* Overlay */}
