@@ -14,6 +14,8 @@ export default function PlaceDetail() {
   const [visitDate, setVisitDate] = useState("");
   const [loadingProgress, setLoadingProgress] = useState(true);
 
+  
+
   console.log("loadingProgress:", loadingProgress);
 
   useEffect(function fetchProgress() {
