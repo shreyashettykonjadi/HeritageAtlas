@@ -14,6 +14,8 @@ export default function PlaceDetail() {
   const [notes, setNotes] = useState("");
   const [visitDate, setVisitDate] = useState("");
   const [loadingProgress, setLoadingProgress] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveState, setSaveState] = useState("idle");
 
   
 
@@ -47,6 +49,34 @@ export default function PlaceDetail() {
 
     load();
   }, [id]);
+
+  async function handleSave() {
+    if (isSaving) return;
+
+    setIsSaving(true);
+    setSaveState("saving");
+
+    try {
+      await api.post("/", {
+        placeId: id,
+        visited,
+        bucket,
+        rating,
+        notes,
+        visitDate,
+      });
+
+      setSaveState("success");
+      setTimeout(function () {
+        setSaveState("idle");
+      }, 2000);
+    } catch (error) {
+      console.error("Failed to save progress", error);
+      setSaveState("error");
+    } finally {
+      setIsSaving(false);
+    }
+  }
 
 
   const site = unescoSites.find(function (s) {
@@ -148,6 +178,9 @@ export default function PlaceDetail() {
             setNotes={setNotes}
             setVisitDate={setVisitDate}
             loadingProgress={loadingProgress}
+            onSave={handleSave}
+            isSaving={isSaving}
+            saveState={saveState}
           />
         </div>
       </div>

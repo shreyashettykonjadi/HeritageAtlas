@@ -10,7 +10,28 @@ export default function ProgressSection({
   setNotes,
   setVisitDate,
   loadingProgress,
+  onSave,
+  isSaving,
+  saveState,
 }) {
+
+  function getButtonLabel() {
+    switch (saveState) {
+      case "saving":
+        return (
+          <>
+            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            Saving...
+          </>
+        );
+      case "success":
+        return "✓ Saved";
+      case "error":
+        return "Retry Save";
+      default:
+        return "Save Changes";
+    }
+  }
   return (
     <div className="bg-linear-to-b from-gray-50/80 to-gray-50 border-t border-gray-100 p-6 sm:p-10">
       <div className="flex items-center gap-3 mb-8">
@@ -112,6 +133,18 @@ export default function ProgressSection({
               placeholder="Write about your experience, memories, or plans for this place..."
               className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-white text-gray-700 resize-none transition-all duration-200 focus:outline-none focus:border-[#1B4436] focus:ring-4 focus:ring-[#1B4436]/10 hover:border-gray-300 placeholder:text-gray-400"
             />
+          </div>
+
+          {/* Save Button */}
+          <div className="pt-4">
+            <button
+              type="button"
+              onClick={onSave}
+              disabled={isSaving}
+              className={`inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-white transition-all duration-200 ${isSaving ? 'bg-[#1B4436]/60 cursor-not-allowed' : 'bg-[#1B4436] hover:bg-[#153429] active:scale-[0.98]'} ${saveState === 'success' ? 'bg-emerald-600 hover:bg-emerald-600' : ''} ${saveState === 'error' ? 'bg-red-600 hover:bg-red-700' : ''}`}
+            >
+              {getButtonLabel()}
+            </button>
           </div>
         </div>
       )}
