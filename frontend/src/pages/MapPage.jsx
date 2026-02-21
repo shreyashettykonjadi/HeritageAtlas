@@ -124,7 +124,7 @@ export default function MapPage() {
         <div id="map" className="absolute inset-0"></div>
         
         {/* Subtle inner texture/vignette overlay */}
-        <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_40px_rgba(27,68,54,0.1)] rounded-2xl z-[400]" />
+        <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_40px_rgba(27,68,54,0.1)] rounded-2xl z-400" />
       </div>
 
       {/* Overlay */}
