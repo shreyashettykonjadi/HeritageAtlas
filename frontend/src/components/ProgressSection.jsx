@@ -11,6 +11,7 @@ export default function ProgressSection({
   onSave,
   isSaving,
   saveState,
+  isDirty,
 }) {
 
   function getButtonLabel() {
@@ -142,8 +143,8 @@ export default function ProgressSection({
             <button
               type="button"
               onClick={onSave}
-              disabled={isSaving}
-              className={`inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-white transition-all duration-200 ${isSaving ? 'bg-[#1B4436]/60 cursor-not-allowed' : 'bg-[#1B4436] hover:bg-[#153429] active:scale-[0.98]'} ${saveState === 'success' ? 'bg-emerald-600 hover:bg-emerald-600' : ''} ${saveState === 'error' ? 'bg-red-600 hover:bg-red-700' : ''}`}
+              disabled={!isDirty || isSaving}
+              className={`inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-white transition-all duration-200 ${(!isDirty || isSaving) ? 'bg-[#1B4436]/60 cursor-not-allowed' : 'bg-[#1B4436] hover:bg-[#153429] active:scale-[0.98]'} ${saveState === 'success' ? 'bg-emerald-600 hover:bg-emerald-600' : ''} ${saveState === 'error' ? 'bg-red-600 hover:bg-red-700' : ''}`}
             >
               {getButtonLabel()}
             </button>

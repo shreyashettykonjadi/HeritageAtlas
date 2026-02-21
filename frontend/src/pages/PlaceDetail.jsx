@@ -16,6 +16,7 @@ export default function PlaceDetail() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveState, setSaveState] = useState("idle");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [initialData, setInitialData] = useState(null);
 
   
 
@@ -31,12 +32,19 @@ export default function PlaceDetail() {
 
         console.log("Progress fetched:", data);// Debug log to verify data structure
         if (data) {
-          setStatus(data.status || "none");
-          setRating(data.rating || null);
-          setNotes(data.notes || "");
-          setVisitDate(
-            data.visitDate ? data.visitDate.split("T")[0] : ""
-          );
+          const snapshot = {
+            status: data.status || "none",
+            rating: data.rating || null,
+            notes: data.notes || "",
+            visitDate: data.visitDate ? data.visitDate.split("T")[0] : "",
+          };
+          setStatus(snapshot.status);
+          setRating(snapshot.rating);
+          setNotes(snapshot.notes);
+          setVisitDate(snapshot.visitDate);
+          setInitialData(snapshot);
+        } else {
+          setInitialData({ status: "none", rating: null, notes: "", visitDate: "" });
         }
       } catch (error) {
         console.error("Failed to fetch progress", error);
@@ -67,7 +75,7 @@ export default function PlaceDetail() {
   }
 
   async function handleSave() {
-    if (isSaving) return;
+    if (!isDirty || isSaving) return;
 
     setIsSaving(true);
     setSaveState("saving");
@@ -93,6 +101,11 @@ export default function PlaceDetail() {
     }
   }
 
+
+  const currentSnapshot = { status, rating, notes, visitDate };
+  const isDirty =
+    initialData !== null &&
+    JSON.stringify(currentSnapshot) !== JSON.stringify(initialData);
 
   const site = unescoSites.find(function (s) {
     return s.id === id
@@ -194,6 +207,7 @@ export default function PlaceDetail() {
             onSave={handleSave}
             isSaving={isSaving}
             saveState={saveState}
+            isDirty={isDirty}
           />
         </div>
       </div>
