@@ -16,6 +16,7 @@ export default function PlaceDetail() {
   const [loadingProgress, setLoadingProgress] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [saveState, setSaveState] = useState("idle");
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   
 
@@ -49,6 +50,24 @@ export default function PlaceDetail() {
 
     load();
   }, [id]);
+
+  function handleBucketToggle(checked) {
+    if (checked && visited && (rating || visitDate || notes.trim())) {
+      setShowConfirmModal(true);
+    } else {
+      setBucket(checked);
+      if (checked) setVisited(false);
+    }
+  }
+
+  function handleConfirmSwitch() {
+    setVisited(false);
+    setBucket(true);
+    setRating(null);
+    setVisitDate("");
+    setNotes("");
+    setShowConfirmModal(false);
+  }
 
   async function handleSave() {
     if (isSaving) return;
@@ -173,7 +192,7 @@ export default function PlaceDetail() {
             notes={notes}
             visitDate={visitDate}
             setVisited={setVisited}
-            setBucket={setBucket}
+            onBucketChange={handleBucketToggle}
             setRating={setRating}
             setNotes={setNotes}
             setVisitDate={setVisitDate}
@@ -184,6 +203,35 @@ export default function PlaceDetail() {
           />
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      {showConfirmModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowConfirmModal(false)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full border border-gray-100">
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">Remove visit details?</h2>
+            <p className="text-gray-500 text-sm leading-relaxed mb-8">
+              Switching to Bucket List will remove your visit details. Continue?
+            </p>
+            <div className="flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setShowConfirmModal(false)}
+                className="px-5 py-2.5 rounded-xl text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmSwitch}
+                className="px-5 py-2.5 rounded-xl text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

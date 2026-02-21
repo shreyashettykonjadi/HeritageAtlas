@@ -5,7 +5,7 @@ export default function ProgressSection({
   notes,
   visitDate,
   setVisited,
-  setBucket,
+  onBucketChange,
   setRating,
   setNotes,
   setVisitDate,
@@ -56,7 +56,10 @@ export default function ProgressSection({
               <input
                 type="checkbox"
                 checked={visited}
-                onChange={(e) => setVisited(e.target.checked)}
+                onChange={(e) => {
+                  setVisited(e.target.checked);
+                  if (e.target.checked) setBucket(false);
+                }}
                 className="sr-only"
               />
               <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${visited ? 'bg-emerald-500 border-emerald-500' : 'border-gray-300 group-hover:border-gray-400'}`}>
@@ -73,7 +76,7 @@ export default function ProgressSection({
               <input
                 type="checkbox"
                 checked={bucket}
-                onChange={(e) => setBucket(e.target.checked)}
+                onChange={(e) => onBucketChange(e.target.checked)}
                 className="sr-only"
               />
               <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${bucket ? 'bg-violet-500 border-violet-500' : 'border-gray-300 group-hover:border-gray-400'}`}>
