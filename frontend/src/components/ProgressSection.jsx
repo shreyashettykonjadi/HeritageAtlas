@@ -90,53 +90,57 @@ export default function ProgressSection({
             </label>
           </div>
 
-          {/* Rating & Date Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Your Rating</label>
-              <select
-                value={rating || ""}
-                onChange={(e) => setRating(e.target.value ? Number(e.target.value) : null)}
-                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-medium transition-all duration-200 focus:outline-none focus:border-[#1B4436] focus:ring-4 focus:ring-[#1B4436]/10 hover:border-gray-300 appearance-none cursor-pointer"
-                style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.75rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}
-              >
-                <option value="">Not rated</option>
-                <option value="1">⭐ Poor</option>
-                <option value="2">⭐⭐ Fair</option>
-                <option value="3">⭐⭐⭐ Good</option>
-                <option value="4">⭐⭐⭐⭐ Great</option>
-                <option value="5">⭐⭐⭐⭐⭐ Amazing</option>
-              </select>
-            </div>
+          {visited && (
+            <>
+              {/* Rating & Date Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Your Rating</label>
+                  <select
+                    value={rating || ""}
+                    onChange={(e) => setRating(e.target.value ? Number(e.target.value) : null)}
+                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-medium transition-all duration-200 focus:outline-none focus:border-[#1B4436] focus:ring-4 focus:ring-[#1B4436]/10 hover:border-gray-300 appearance-none cursor-pointer"
+                    style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.75rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em', paddingRight: '2.5rem' }}
+                  >
+                    <option value="">Not rated</option>
+                    <option value="1">⭐ Poor</option>
+                    <option value="2">⭐⭐ Fair</option>
+                    <option value="3">⭐⭐⭐ Good</option>
+                    <option value="4">⭐⭐⭐⭐ Great</option>
+                    <option value="5">⭐⭐⭐⭐⭐ Amazing</option>
+                  </select>
+                </div>
 
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Visit Date</label>
-              <input
-                type="date"
-                value={visitDate}
-                onChange={(e) => setVisitDate(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-medium transition-all duration-200 focus:outline-none focus:border-[#1B4436] focus:ring-4 focus:ring-[#1B4436]/10 hover:border-gray-300"
-              />
-            </div>
-          </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Visit Date</label>
+                  <input
+                    type="date"
+                    value={visitDate}
+                    onChange={(e) => setVisitDate(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-medium transition-all duration-200 focus:outline-none focus:border-[#1B4436] focus:ring-4 focus:ring-[#1B4436]/10 hover:border-gray-300"
+                  />
+                </div>
+              </div>
 
-          {/* Notes */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="block text-sm font-medium text-gray-700">Personal Notes</label>
-              <span className={`text-xs font-medium transition-colors ${notes.length > 450 ? 'text-amber-600' : 'text-gray-400'}`}>
-                {notes.length}/500
-              </span>
-            </div>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              maxLength={500}
-              rows={4}
-              placeholder="Write about your experience, memories, or plans for this place..."
-              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-white text-gray-700 resize-none transition-all duration-200 focus:outline-none focus:border-[#1B4436] focus:ring-4 focus:ring-[#1B4436]/10 hover:border-gray-300 placeholder:text-gray-400"
-            />
-          </div>
+              {/* Notes */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="block text-sm font-medium text-gray-700">Personal Notes</label>
+                  <span className={`text-xs font-medium transition-colors ${notes.length > 450 ? 'text-amber-600' : 'text-gray-400'}`}>
+                    {notes.length}/500
+                  </span>
+                </div>
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  maxLength={500}
+                  rows={4}
+                  placeholder="Write about your experience, memories, or plans for this place..."
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-white text-gray-700 resize-none transition-all duration-200 focus:outline-none focus:border-[#1B4436] focus:ring-4 focus:ring-[#1B4436]/10 hover:border-gray-300 placeholder:text-gray-400"
+                />
+              </div>
+            </>
+          )}
 
           {/* Save Button */}
           <div className="pt-4">
