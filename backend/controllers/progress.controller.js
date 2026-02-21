@@ -18,20 +18,15 @@ export async function createOrUpdateProgress(req, res) {
 
     // Build updated state by merging
     const updatedState = {
-      visited: current.visited || false,
-      bucket: current.bucket || false,
+      status: current.status || "none",
       rating: current.rating,
       notes: current.notes,
       visitDate: current.visitDate,
     };
 
     // Apply incoming fields only if defined
-    if ("visited" in req.body) {
-      updatedState.visited = req.body.visited;
-    }
-
-    if ("bucket" in req.body) {
-      updatedState.bucket = req.body.bucket;
+    if ("status" in req.body) {
+      updatedState.status = req.body.status;
     }
 
     if ("rating" in req.body) {
@@ -43,20 +38,15 @@ export async function createOrUpdateProgress(req, res) {
     }
 
     if ("visitDate" in req.body) {
-        updatedState.visitDate = req.body.visitDate;
-
-        if (req.body.visitDate) {
-            updatedState.visited = true;
-        }
+      updatedState.visitDate = req.body.visitDate;
     }
 
     // Determine if record is empty
     const isEmpty =
-        updatedState.visited === false &&
-        updatedState.bucket !== true &&
-        (updatedState.rating === undefined || updatedState.rating === null) &&
-        (!updatedState.notes || updatedState.notes.trim() === "") &&
-        !updatedState.visitDate;
+      updatedState.status === "none" &&
+      (updatedState.rating === undefined || updatedState.rating === null) &&
+      (!updatedState.notes || updatedState.notes.trim() === "") &&
+      !updatedState.visitDate;
 
 
     if (isEmpty) {

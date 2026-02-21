@@ -12,13 +12,10 @@ const userProgressSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    visited: {
-      type: Boolean,
-      default: false,
-    },
-    bucket: {
-      type: Boolean,
-      default: false,
+    status: {
+      type: String,
+      enum: ["none", "visited", "bucket"],
+      default: "none",
     },
     rating: {
       type: Number,

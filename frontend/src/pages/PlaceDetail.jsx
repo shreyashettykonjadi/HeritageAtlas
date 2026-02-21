@@ -8,8 +8,7 @@ import ProgressSection from "../components/ProgressSection"
 export default function PlaceDetail() {
   const { id } = useParams()
 
-  const [visited, setVisited] = useState(false);
-  const [bucket, setBucket] = useState(false);
+  const [status, setStatus] = useState("none");
   const [rating, setRating] = useState(null);
   const [notes, setNotes] = useState("");
   const [visitDate, setVisitDate] = useState("");
@@ -32,8 +31,7 @@ export default function PlaceDetail() {
 
         console.log("Progress fetched:", data);// Debug log to verify data structure
         if (data) {
-          setVisited(data.visited || false);
-          setBucket(data.bucket || false);
+          setStatus(data.status || "none");
           setRating(data.rating || null);
           setNotes(data.notes || "");
           setVisitDate(
@@ -51,18 +49,17 @@ export default function PlaceDetail() {
     load();
   }, [id]);
 
-  function handleBucketToggle(checked) {
-    if (checked && visited && (rating || visitDate || notes.trim())) {
+  function handleStatusChange(newStatus) {
+    const next = status === newStatus ? "none" : newStatus;
+    if (next === "bucket" && status === "visited" && (rating || visitDate || notes.trim())) {
       setShowConfirmModal(true);
     } else {
-      setBucket(checked);
-      if (checked) setVisited(false);
+      setStatus(next);
     }
   }
 
   function handleConfirmSwitch() {
-    setVisited(false);
-    setBucket(true);
+    setStatus("bucket");
     setRating(null);
     setVisitDate("");
     setNotes("");
@@ -78,8 +75,7 @@ export default function PlaceDetail() {
     try {
       await api.post("/", {
         placeId: id,
-        visited,
-        bucket,
+        status,
         rating,
         notes,
         visitDate,
@@ -186,13 +182,11 @@ export default function PlaceDetail() {
 
           {/* Your Journey Section */}
           <ProgressSection
-            visited={visited}
-            bucket={bucket}
+            status={status}
+            onStatusChange={handleStatusChange}
             rating={rating}
             notes={notes}
             visitDate={visitDate}
-            setVisited={setVisited}
-            onBucketChange={handleBucketToggle}
             setRating={setRating}
             setNotes={setNotes}
             setVisitDate={setVisitDate}

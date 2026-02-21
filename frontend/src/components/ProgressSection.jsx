@@ -1,11 +1,9 @@
 export default function ProgressSection({
-  visited,
-  bucket,
+  status,
+  onStatusChange,
   rating,
   notes,
   visitDate,
-  setVisited,
-  onBucketChange,
   setRating,
   setNotes,
   setVisitDate,
@@ -52,45 +50,42 @@ export default function ProgressSection({
         <div className="space-y-8">
           {/* Status Toggles */}
           <div className="flex flex-wrap gap-4">
-            <label className={`group flex items-center gap-3 px-5 py-3.5 rounded-xl border-2 cursor-pointer select-none transition-all duration-200 ${visited ? 'bg-emerald-50 border-emerald-200 shadow-sm' : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm'}`}>
+            <label className={`group flex items-center gap-3 px-5 py-3.5 rounded-xl border-2 cursor-pointer select-none transition-all duration-200 ${status === 'visited' ? 'bg-emerald-50 border-emerald-200 shadow-sm' : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm'}`}>
               <input
                 type="checkbox"
-                checked={visited}
-                onChange={(e) => {
-                  setVisited(e.target.checked);
-                  if (e.target.checked) setBucket(false);
-                }}
+                checked={status === 'visited'}
+                onChange={() => onStatusChange('visited')}
                 className="sr-only"
               />
-              <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${visited ? 'bg-emerald-500 border-emerald-500' : 'border-gray-300 group-hover:border-gray-400'}`}>
-                {visited && (
+              <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${status === 'visited' ? 'bg-emerald-500 border-emerald-500' : 'border-gray-300 group-hover:border-gray-400'}`}>
+                {status === 'visited' && (
                   <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 )}
               </div>
-              <span className={`font-medium transition-colors ${visited ? 'text-emerald-800' : 'text-gray-700'}`}>Visited</span>
+              <span className={`font-medium transition-colors ${status === 'visited' ? 'text-emerald-800' : 'text-gray-700'}`}>Visited</span>
             </label>
 
-            <label className={`group flex items-center gap-3 px-5 py-3.5 rounded-xl border-2 cursor-pointer select-none transition-all duration-200 ${bucket ? 'bg-violet-50 border-violet-200 shadow-sm' : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm'}`}>
+            <label className={`group flex items-center gap-3 px-5 py-3.5 rounded-xl border-2 cursor-pointer select-none transition-all duration-200 ${status === 'bucket' ? 'bg-violet-50 border-violet-200 shadow-sm' : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm'}`}>
               <input
                 type="checkbox"
-                checked={bucket}
-                onChange={(e) => onBucketChange(e.target.checked)}
+                checked={status === 'bucket'}
+                onChange={() => onStatusChange('bucket')}
                 className="sr-only"
               />
-              <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${bucket ? 'bg-violet-500 border-violet-500' : 'border-gray-300 group-hover:border-gray-400'}`}>
-                {bucket && (
+              <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${status === 'bucket' ? 'bg-violet-500 border-violet-500' : 'border-gray-300 group-hover:border-gray-400'}`}>
+                {status === 'bucket' && (
                   <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 )}
               </div>
-              <span className={`font-medium transition-colors ${bucket ? 'text-violet-800' : 'text-gray-700'}`}>Bucket List</span>
+              <span className={`font-medium transition-colors ${status === 'bucket' ? 'text-violet-800' : 'text-gray-700'}`}>Bucket List</span>
             </label>
           </div>
 
-          {visited && (
+          {status === 'visited' && (
             <>
               {/* Rating & Date Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
