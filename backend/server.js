@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import progressRoutes from "./routes/progress.routes.js";
+import siteRoutes from "./routes/site.routes.js";
 import rateLimit from "express-rate-limit";
 
 dotenv.config();
@@ -23,6 +24,7 @@ app.use(limiter);
 
 
 app.use("/progress", progressRoutes);
+app.use("/sites", siteRoutes);    
 
 const PORT = process.env.PORT || 5000;
 
