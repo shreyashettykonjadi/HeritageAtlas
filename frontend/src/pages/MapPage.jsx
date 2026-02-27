@@ -15,14 +15,14 @@ export default function MapPage() {
   const mapRef = useRef(null)   
   const markersRef = useRef(null)
 
-  useEffect(function fetchProgress() {
+  useEffect(function fetchProgress() {    // Fetch user's progress data on initial load to determine marker colors in "My Journey" mode
     async function load() {
       setLoadingProgress(true);
       try {
         const response = await api.get("/");
         const map = {};
         response.data.forEach(function (record) {
-          map[record.placeId] = record.status;
+          map[record.placeId] = record.status;    
         });
         setProgressMap(map);
       } catch (error) {
@@ -79,7 +79,7 @@ export default function MapPage() {
     }
   }, [selectedSite])
 
-  useEffect(function () {   // Update markers whenever mapMode changes to different color coding
+  useEffect(function () {   // Update markers whenever mapMode changes to different color coding or filtering based on user progress
     if (!markersRef.current) return
     markersRef.current.clearLayers()
 
