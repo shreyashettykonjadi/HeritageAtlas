@@ -23,7 +23,7 @@ export default function SidePanel({ site, onClose }) {
     setIsVisible(false)
     setTimeout(function () {
       onClose()
-      navigate(`/place/${site.id}`)
+      navigate(`/place/${site.slug}`)
     }, 300)
   }
 

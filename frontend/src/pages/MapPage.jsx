@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from "react"
 import L from "leaflet"
 import "leaflet/dist/leaflet.css"
-import unescoSites from "../data/unesco"
 import api from "../services/api"
 import MapModeToggle from "../components/MapModeToggle"
 import SidePanel from "../components/SidePanel"
@@ -10,10 +9,28 @@ export default function MapPage() {
 
   const [mapMode, setMapMode] = useState("categories")
   const [selectedSite, setSelectedSite] = useState(null)
+  const [sites, setSites] = useState([])
+  const [loadingSites, setLoadingSites] = useState(false)
   const [progressMap, setProgressMap] = useState({})
   const [loadingProgress, setLoadingProgress] = useState(false)
   const mapRef = useRef(null)   
   const markersRef = useRef(null)
+
+  useEffect(function fetchSites() {
+    async function load() {
+      setLoadingSites(true);
+      try {
+        const response = await api.get("/sites/map");
+        setSites(response.data);
+      } catch (error) {
+        console.error("Failed to fetch sites", error);
+      } finally {
+        setLoadingSites(false);
+      }
+    }
+
+    load();
+  }, [])
 
   useEffect(function fetchProgress() {    // Fetch user's progress data on initial load to determine marker colors in "My Journey" mode
     async function load() {
@@ -83,7 +100,7 @@ export default function MapPage() {
     if (!markersRef.current) return
     markersRef.current.clearLayers()
 
-    unescoSites.forEach(function (site) {
+    sites.forEach(function (site) {
       var color = null
       if (mapMode === "categories") {
         if (site.category === "Cultural") color = "#A16207"
@@ -92,13 +109,13 @@ export default function MapPage() {
       }
 
       if (mapMode === "journey") {
-        const siteStatus = progressMap[site.id];
+        const siteStatus = progressMap[site.slug];
         if (siteStatus === "visited") color = "#5ac972"
         else if (siteStatus === "bucket") color = "#9333EA"
         else return
       }
 
-      L.circleMarker([site.lat, site.lng], {
+      L.circleMarker([site.location.coordinates[1], site.location.coordinates[0]], {
         radius: 6,
         fillColor: color,
         color: "#ffffff",
@@ -110,7 +127,7 @@ export default function MapPage() {
           setSelectedSite(site)
         })
     })
-  }, [mapMode, progressMap])
+  }, [mapMode, progressMap, sites])
 
   function setMapInteractionState(map, isEnabled) {   // Enable/disable all map interactions (called when opening/closing side panel)
     if (!map) return
