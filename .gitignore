@@ -56,3 +56,6 @@ docs/
 *.pid
 *.seed
  
+# Ignore data files that are generated or updated during development, as they may contain user-specific progress or be too large for version control
+backend/data/*.csv
+backend/data/*.json
