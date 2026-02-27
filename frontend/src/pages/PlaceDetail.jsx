@@ -48,6 +48,7 @@ export default function PlaceDetail() {
         }
       } catch (error) {
         console.error("Failed to fetch progress", error);
+        setInitialData({ status: "none", rating: null, notes: "", visitDate: "" });
       } finally {
         console.log("Setting loadingProgress to false");
         setLoadingProgress(false);
@@ -89,6 +90,7 @@ export default function PlaceDetail() {
         visitDate,
       });
 
+      setInitialData({ status, rating, notes, visitDate });
       setSaveState("success");
       setTimeout(function () {
         setSaveState("idle");
@@ -102,10 +104,14 @@ export default function PlaceDetail() {
   }
 
 
-  const currentSnapshot = { status, rating, notes, visitDate };
   const isDirty =
     initialData !== null &&
-    JSON.stringify(currentSnapshot) !== JSON.stringify(initialData);
+    (
+      status !== initialData.status ||
+      rating !== initialData.rating ||
+      notes !== initialData.notes ||
+      visitDate !== initialData.visitDate
+    );
 
   const site = unescoSites.find(function (s) {
     return s.id === id

@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react"
 import L from "leaflet"
 import "leaflet/dist/leaflet.css"
 import unescoSites from "../data/unesco"
+import api from "../services/api"
 import MapModeToggle from "../components/MapModeToggle"
 import SidePanel from "../components/SidePanel"
 
@@ -9,8 +10,30 @@ export default function MapPage() {
 
   const [mapMode, setMapMode] = useState("categories")
   const [selectedSite, setSelectedSite] = useState(null)
+  const [progressMap, setProgressMap] = useState({})
+  const [loadingProgress, setLoadingProgress] = useState(false)
   const mapRef = useRef(null)   
   const markersRef = useRef(null)
+
+  useEffect(function fetchProgress() {
+    async function load() {
+      setLoadingProgress(true);
+      try {
+        const response = await api.get("/");
+        const map = {};
+        response.data.forEach(function (record) {
+          map[record.placeId] = record.status;
+        });
+        setProgressMap(map);
+      } catch (error) {
+        console.error("Failed to fetch progress", error);
+      } finally {
+        setLoadingProgress(false);
+      }
+    }
+
+    load();
+  }, [])
 
   useEffect(function () {   // Initialize map on first load with custom settings to restrict panning/zooming to world and prevent tile wrapping/repetition
     // defined bounds for the world
@@ -69,8 +92,9 @@ export default function MapPage() {
       }
 
       if (mapMode === "journey") {
-        if (site.visited) color = "#5ac972"
-        else if (site.bucket) color = "#9333EA"
+        const siteStatus = progressMap[site.id];
+        if (siteStatus === "visited") color = "#5ac972"
+        else if (siteStatus === "bucket") color = "#9333EA"
         else return
       }
 
@@ -86,7 +110,7 @@ export default function MapPage() {
           setSelectedSite(site)
         })
     })
-  }, [mapMode])
+  }, [mapMode, progressMap])
 
   function setMapInteractionState(map, isEnabled) {   // Enable/disable all map interactions (called when opening/closing side panel)
     if (!map) return
