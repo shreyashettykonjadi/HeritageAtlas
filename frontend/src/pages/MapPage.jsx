@@ -36,7 +36,7 @@ export default function MapPage() {
     async function load() {
       setLoadingProgress(true);
       try {
-        const response = await api.get("/");
+        const response = await api.get("/progress");
         const map = {};
         response.data.forEach(function (record) {
           map[record.placeId] = record.status;    

@@ -43,7 +43,7 @@ export default function PlaceDetail() {
     async function load() {
       try {
 
-        const response = await api.get(`/${slug}`);
+        const response = await api.get(`/progress/${slug}`);
         const data = response.data;
 
         if (data) {
@@ -95,7 +95,7 @@ export default function PlaceDetail() {
     setSaveState("saving");
 
     try {
-      await api.post("/", {
+      await api.post("/progress", {
         placeId: slug,
         status,
         rating,

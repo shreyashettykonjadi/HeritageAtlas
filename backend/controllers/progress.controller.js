@@ -45,7 +45,7 @@ export async function createOrUpdateProgress(req, res) {
     }
 
     if ("visitDate" in req.body) {
-      updatedState.visitDate = req.body.visitDate;
+      updatedState.visitDate = req.body.visitDate || null;
     }
 
     // Determine if record is empty
