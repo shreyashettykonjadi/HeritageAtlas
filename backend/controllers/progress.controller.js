@@ -1,4 +1,5 @@
 import UserProgress from "../models/UserProgress.js";
+import UnescoSite from "../models/UnescoSite.js";
 
 // POST /progress
 export async function createOrUpdateProgress(req, res) {
@@ -10,8 +11,14 @@ export async function createOrUpdateProgress(req, res) {
       return res.status(400).json({ message: "placeId is required" });
     }
 
+    // Resolve slug → ObjectId
+    const site = await UnescoSite.findOne({ slug: placeId });
+    if (!site) {
+      return res.status(404).json({ message: "Site not found" });
+    }
+
     // Fetch existing record (if any)
-    const existing = await UserProgress.findOne({ userId, placeId });
+    const existing = await UserProgress.findOne({ userId, site: site._id });
 
     // Start from existing values if present
     const current = existing ? existing.toObject() : {};
@@ -50,13 +57,13 @@ export async function createOrUpdateProgress(req, res) {
 
 
     if (isEmpty) {
-      await UserProgress.findOneAndDelete({ userId, placeId });
+      await UserProgress.findOneAndDelete({ userId, site: site._id });
       return res.status(200).json({ message: "Progress removed" });
     }
 
     // Upsert with $set
     const updated = await UserProgress.findOneAndUpdate(
-      { userId, placeId },
+      { userId, site: site._id },
       { $set: updatedState },
       { returnDocument: "after", upsert: true, runValidators: true }
     );
@@ -73,7 +80,7 @@ export async function getUserProgress(req, res) {
   try {
     const userId = req.userId;
 
-    const progress = await UserProgress.find({ userId });
+    const progress = await UserProgress.find({ userId }).populate("site", "slug");
 
     return res.status(200).json(progress);
 
@@ -86,13 +93,19 @@ export async function getUserProgress(req, res) {
 export async function getSingleProgress(req, res) {
   try {
     const userId = req.userId;
-    const placeId = req.params.placeId;
+    const slug = req.params.placeId;
 
-    if (!placeId) {
+    if (!slug) {
       return res.status(400).json({ message: "placeId is required" });
     }
 
-    const progress = await UserProgress.findOne({ userId, placeId });
+    // Resolve slug → ObjectId
+    const site = await UnescoSite.findOne({ slug });
+    if (!site) {
+      return res.status(200).json(null);
+    }
+
+    const progress = await UserProgress.findOne({ userId, site: site._id });
 
     // IMPORTANT: return null if not found (NOT 404)
     return res.status(200).json(progress || null);
