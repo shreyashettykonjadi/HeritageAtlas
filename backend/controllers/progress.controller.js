@@ -25,7 +25,7 @@ export async function createOrUpdateProgress(req, res) {
 
     // Build updated state by merging
     const updatedState = {
-      status: current.status || "none",
+      status: current.status || undefined,
       rating: current.rating,
       notes: current.notes,
       visitDate: current.visitDate,
@@ -33,7 +33,7 @@ export async function createOrUpdateProgress(req, res) {
 
     // Apply incoming fields only if defined
     if ("status" in req.body) {
-      updatedState.status = req.body.status;
+      updatedState.status = req.body.status === "none" ? undefined : req.body.status;
     }
 
     if ("rating" in req.body) {
@@ -50,7 +50,7 @@ export async function createOrUpdateProgress(req, res) {
 
     // Determine if record is empty
     const isEmpty =
-      updatedState.status === "none" &&
+      (!updatedState.status) &&
       (updatedState.rating === undefined || updatedState.rating === null) &&
       (!updatedState.notes || updatedState.notes.trim() === "") &&
       !updatedState.visitDate;
@@ -80,9 +80,19 @@ export async function getUserProgress(req, res) {
   try {
     const userId = req.userId;
 
-    const progress = await UserProgress.find({ userId }).populate("site", "slug");
+    const progress = await UserProgress.find({ userId })
+      .populate("site", "slug name category country mainImage images")
+      .sort({ updatedAt: -1 });
 
-    return res.status(200).json(progress);
+    const mapped = progress.map(function (doc) {
+      const obj = doc.toObject();
+      if (obj.site) {
+        obj.site.images = obj.site.images ? obj.site.images.slice(0, 5) : [];
+      }
+      return obj;
+    });
+
+    return res.status(200).json(mapped);
 
   } catch (error) {
     return res.status(500).json({ message: error.message });

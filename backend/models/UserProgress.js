@@ -15,8 +15,7 @@ const userProgressSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["none", "visited", "bucket"],
-      default: "none",
+      enum: ["visited", "bucket"],
     },
     rating: {
       type: Number,
