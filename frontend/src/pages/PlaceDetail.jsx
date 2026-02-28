@@ -1,13 +1,15 @@
 import { useParams, Link } from "react-router-dom"
 import api from "../services/api";
 import { useEffect, useState } from "react"
-import unescoSites from "../data/unesco"
 import ProgressSection from "../components/ProgressSection"
 
 
 export default function PlaceDetail() {
-  const { id } = useParams()
+  const { slug } = useParams()
 
+  const [site, setSite] = useState(null);
+  const [loadingSite, setLoadingSite] = useState(true);
+  const [siteError, setSiteError] = useState(false);
   const [status, setStatus] = useState("none");
   const [rating, setRating] = useState(null);
   const [notes, setNotes] = useState("");
@@ -18,19 +20,32 @@ export default function PlaceDetail() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [initialData, setInitialData] = useState(null);
 
-  
+  useEffect(function fetchSite() {
+    async function load() {
+      setLoadingSite(true);
+      setSiteError(false);
+      try {
+        const response = await api.get(`/sites/${slug}`);
+        setSite(response.data);
+      } catch (error) {
+        console.error("Failed to fetch site", error);
+        setSiteError(true);
+      } finally {
+        setLoadingSite(false);
+      }
+    }
 
-  console.log("loadingProgress:", loadingProgress);
+    load();
+  }, [slug]);
+
 
   useEffect(function fetchProgress() {
     async function load() {
       try {
-        console.log("Fetching progress for:", id);    // Debug log to verify ID is correct
 
-        const response = await api.get(`/${id}`);
+        const response = await api.get(`/${slug}`);
         const data = response.data;
 
-        console.log("Progress fetched:", data);// Debug log to verify data structure
         if (data) {
           const snapshot = {
             status: data.status || "none",
@@ -47,16 +62,14 @@ export default function PlaceDetail() {
           setInitialData({ status: "none", rating: null, notes: "", visitDate: "" });
         }
       } catch (error) {
-        console.error("Failed to fetch progress", error);
         setInitialData({ status: "none", rating: null, notes: "", visitDate: "" });
       } finally {
-        console.log("Setting loadingProgress to false");
         setLoadingProgress(false);
       }
     }
 
     load();
-  }, [id]);
+  }, [slug]);
 
   function handleStatusChange(newStatus) {
     const next = status === newStatus ? "none" : newStatus;
@@ -83,7 +96,7 @@ export default function PlaceDetail() {
 
     try {
       await api.post("/", {
-        placeId: id,
+        placeId: slug,
         status,
         rating,
         notes,
@@ -96,7 +109,6 @@ export default function PlaceDetail() {
         setSaveState("idle");
       }, 2000);
     } catch (error) {
-      console.error("Failed to save progress", error);
       setSaveState("error");
     } finally {
       setIsSaving(false);
@@ -113,12 +125,16 @@ export default function PlaceDetail() {
       visitDate !== initialData.visitDate
     );
 
-  const site = unescoSites.find(function (s) {
-    return s.id === id
-  })
+  if (loadingSite) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        <div className="w-8 h-8 border-3 border-[#1B4436]/20 border-t-[#1B4436] rounded-full animate-spin" />
+        <span className="mt-4 text-gray-500 text-sm">Loading site...</span>
+      </div>
+    )
+  }
 
-  // Handle case where site is not found
-  if (!site) {
+  if (siteError || !site) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-6">
         <h1 className="text-3xl font-bold text-gray-800 mb-4">Site Not Found</h1>

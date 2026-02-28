@@ -16,7 +16,7 @@ export default function MapPage() {
   const mapRef = useRef(null)   
   const markersRef = useRef(null)
 
-  useEffect(function fetchSites() {
+  useEffect(function fetchSites() {   // Fetch site data for map markers on initial load (separately from progress data to optimize loading and allow for independent error handling/loading states if desired in future)
     async function load() {
       setLoadingSites(true);
       try {

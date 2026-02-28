@@ -13,7 +13,7 @@ export default function App() {
         <main className="flex-1 flex flex-col">
           <Routes>
             <Route path="/" element={<MapPage />} />
-            <Route path="/place/:id" element={<PlaceDetail />} />
+            <Route path="/place/:slug" element={<PlaceDetail />} />
             <Route path="/my-journey" element={<MyJourney />} />
           </Routes>
         </main>

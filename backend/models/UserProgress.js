@@ -7,10 +7,11 @@ const userProgressSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    placeId: {
-      type: String,
+    site: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "UnescoSite",
       required: true,
-      trim: true,
+      index: true,
     },
     status: {
       type: String,
@@ -36,7 +37,7 @@ const userProgressSchema = new mongoose.Schema(
 
 // Prevent duplicate progress per user per place compound index key
 userProgressSchema.index(
-  { userId: 1, placeId: 1 },
+  { userId: 1, site: 1 },
   { unique: true }
 );
 
