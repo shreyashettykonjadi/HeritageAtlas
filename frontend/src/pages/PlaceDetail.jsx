@@ -20,7 +20,7 @@ export default function PlaceDetail() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [initialData, setInitialData] = useState(null);
 
-  useEffect(function fetchSite() {
+  useEffect(function fetchSite() {// Fetch site details based on slug from URL parameter
     async function load() {
       setLoadingSite(true);
       setSiteError(false);
@@ -39,7 +39,7 @@ export default function PlaceDetail() {
   }, [slug]);
 
 
-  useEffect(function fetchProgress() {
+  useEffect(function fetchProgress() {    // Fetch user's progress for this site to populate "Your Journey" section and determine initial state of status/rating/notes/visitDate
     async function load() {
       try {
 
