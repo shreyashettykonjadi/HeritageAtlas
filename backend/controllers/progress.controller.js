@@ -116,3 +116,24 @@ export async function getSingleProgress(req, res) {
   return res.status(200).json(progress || null);
 }
 
+// DELETE /progress/:slug
+export async function deleteProgress(req, res) {
+  const { slug } = req.params;
+  const userId = req.userId;
+
+  const site = await UnescoSite.findOne({ slug });
+
+  if (!site) {
+    const err = new Error("Site not found");
+    err.status = 404;
+    throw err;
+  }
+
+  await UserProgress.findOneAndDelete({
+    userId,
+    site: site._id
+  });
+
+  return res.status(204).end();
+}
+

@@ -3,6 +3,7 @@ import {
   createOrUpdateProgress,
   getUserProgress,
   getSingleProgress,
+  deleteProgress,
 } from "../controllers/progress.controller.js";
 import { requireAnonymousId } from "../middleware/anonymous.middleware.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -19,5 +20,8 @@ router.get("/:placeId", asyncHandler(getSingleProgress));
 
 // Create or update progress
 router.post("/", asyncHandler(createOrUpdateProgress));
+
+// Delete progress
+router.delete("/:slug", asyncHandler(deleteProgress));
 
 export default router;
