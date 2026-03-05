@@ -39,7 +39,9 @@ export default function MapPage() {
         const response = await api.get("/progress");
         const map = {};
         response.data.forEach(function (record) {
-          map[record.placeId] = record.status;    
+          if (record.site && record.site.slug) {
+            map[record.site.slug] = record.status;
+          }
         });
         setProgressMap(map);
       } catch (error) {
