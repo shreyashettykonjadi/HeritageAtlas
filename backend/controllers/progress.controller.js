@@ -3,19 +3,22 @@ import UnescoSite from "../models/UnescoSite.js";
 
 // POST /progress
 export async function createOrUpdateProgress(req, res) {
-  try {
-    const userId = req.userId;
-    const { placeId } = req.body;
+  const userId = req.userId;
+  const { placeId } = req.body;
 
-    if (!placeId) {
-      return res.status(400).json({ message: "placeId is required" });
-    }
+  if (!placeId) {
+    const err = new Error("placeId is required");
+    err.status = 400;
+    throw err;
+  }
 
-    // Resolve slug → ObjectId
-    const site = await UnescoSite.findOne({ slug: placeId });
-    if (!site) {
-      return res.status(404).json({ message: "Site not found" });
-    }
+  // Resolve slug → ObjectId
+  const site = await UnescoSite.findOne({ slug: placeId });
+  if (!site) {
+    const err = new Error("Site not found");
+    err.status = 404;
+    throw err;
+  }
 
     // Fetch existing record (if any)
     const existing = await UserProgress.findOne({ userId, site: site._id });
@@ -69,59 +72,47 @@ export async function createOrUpdateProgress(req, res) {
     );
 
     return res.status(200).json(updated);
-
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
 }
 
 // GET /progress
 export async function getUserProgress(req, res) {
-  try {
-    const userId = req.userId;
+  const userId = req.userId;
 
-    const progress = await UserProgress.find({ userId })
-      .populate("site", "slug name category country mainImage images")
-      .sort({ updatedAt: -1 });
+  const progress = await UserProgress.find({ userId })
+    .populate("site", "slug name category country mainImage images")
+    .sort({ updatedAt: -1 });
 
-    const mapped = progress.map(function (doc) {
-      const obj = doc.toObject();
-      if (obj.site) {
-        obj.site.images = obj.site.images ? obj.site.images.slice(0, 5) : [];
-      }
-      return obj;
-    });
+  const mapped = progress.map(function (doc) {
+    const obj = doc.toObject();
+    if (obj.site) {
+      obj.site.images = obj.site.images ? obj.site.images.slice(0, 5) : [];
+    }
+    return obj;
+  });
 
-    return res.status(200).json(mapped);
-
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
+  return res.status(200).json(mapped);
 }
 
 // GET /progress/:placeId
 export async function getSingleProgress(req, res) {
-  try {
-    const userId = req.userId;
-    const slug = req.params.placeId;
+  const userId = req.userId;
+  const slug = req.params.placeId;
 
-    if (!slug) {
-      return res.status(400).json({ message: "placeId is required" });
-    }
-
-    // Resolve slug → ObjectId
-    const site = await UnescoSite.findOne({ slug });
-    if (!site) {
-      return res.status(200).json(null);
-    }
-
-    const progress = await UserProgress.findOne({ userId, site: site._id });
-
-    // IMPORTANT: return null if not found (NOT 404)
-    return res.status(200).json(progress || null);
-
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
+  if (!slug) {
+    const err = new Error("placeId is required");
+    err.status = 400;
+    throw err;
   }
+
+  // Resolve slug → ObjectId
+  const site = await UnescoSite.findOne({ slug });
+  if (!site) {
+    return res.status(200).json(null);
+  }
+
+  const progress = await UserProgress.findOne({ userId, site: site._id });
+
+  // IMPORTANT: return null if not found (NOT 404)
+  return res.status(200).json(progress || null);
 }
 

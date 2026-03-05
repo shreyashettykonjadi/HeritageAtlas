@@ -5,18 +5,19 @@ import {
   getSingleProgress,
 } from "../controllers/progress.controller.js";
 import { requireAnonymousId } from "../middleware/anonymous.middleware.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 const router = express.Router();
 
 router.use(requireAnonymousId);
 
 // Get all progress for current user
-router.get("/", getUserProgress);
+router.get("/", asyncHandler(getUserProgress));
 
 // Get single place progress for current user
-router.get("/:placeId", getSingleProgress);
+router.get("/:placeId", asyncHandler(getSingleProgress));
 
 // Create or update progress
-router.post("/", createOrUpdateProgress);
+router.post("/", asyncHandler(createOrUpdateProgress));
 
 export default router;

@@ -4,7 +4,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 
 const router = express.Router();
 
-router.get("/map", getMapSites);
+router.get("/map", asyncHandler(getMapSites));
 router.get("/:slug", asyncHandler(getSiteBySlug));
 
 export default router;
