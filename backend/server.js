@@ -5,6 +5,7 @@ import connectDB from "./config/db.js";
 import progressRoutes from "./routes/progress.routes.js";
 import siteRoutes from "./routes/site.routes.js";
 import rateLimit from "express-rate-limit";
+import { errorMiddleware } from "./middleware/error.middleware.js";
 
 dotenv.config();
 
@@ -40,16 +41,7 @@ app.use(function (req, res, next) {
 });
 
 // Global error handler (must be LAST middleware)
-app.use(function (err, req, res, next) {
-  console.error(err);
-
-  const status = err.status || 500;
-
-  res.status(status).json({
-    success: false,
-    message: status === 500 ? "Internal Server Error" : err.message,
-  });
-});
+app.use(errorMiddleware);
 
 async function startServer() {
   try {
