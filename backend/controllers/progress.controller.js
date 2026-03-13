@@ -1,6 +1,8 @@
 import UserProgress from "../models/UserProgress.js";
 import UnescoSite from "../models/UnescoSite.js";
 
+const IMAGE_PREVIEW_LIMIT = 5;
+
 // POST /progress
 export async function createOrUpdateProgress(req, res) {
   const userId = req.userId;
@@ -20,58 +22,58 @@ export async function createOrUpdateProgress(req, res) {
     throw err;
   }
 
-    // Fetch existing record (if any)
-    const existing = await UserProgress.findOne({ userId, site: site._id });
+  // Fetch existing record (if any)
+  const existing = await UserProgress.findOne({ userId, site: site._id });
 
-    // Start from existing values if present
-    const current = existing ? existing.toObject() : {};
+  // Start from existing values if present
+  const current = existing ? existing.toObject() : {};
 
-    // Build updated state by merging
-    const updatedState = {
-      status: current.status || undefined,
-      rating: current.rating,
-      notes: current.notes,
-      visitDate: current.visitDate,
-    };
+  // Build updated state by merging
+  const updatedState = {
+    status: current.status || undefined,
+    rating: current.rating,
+    notes: current.notes,
+    visitDate: current.visitDate,
+  };
 
-    // Apply incoming fields only if defined
-    if ("status" in req.body) {
-      updatedState.status = req.body.status === "none" ? undefined : req.body.status;
-    }
+  // Apply incoming fields only if defined
+  if ("status" in req.body) {
+    updatedState.status = req.body.status === "none" ? undefined : req.body.status;
+  }
 
-    if ("rating" in req.body) {
-      updatedState.rating = req.body.rating;
-    }
+  if ("rating" in req.body) {
+    updatedState.rating = req.body.rating;
+  }
 
-    if ("notes" in req.body) {
-      updatedState.notes = req.body.notes;
-    }
+  if ("notes" in req.body) {
+    updatedState.notes = req.body.notes;
+  }
 
-    if ("visitDate" in req.body) {
-      updatedState.visitDate = req.body.visitDate || null;
-    }
+  if ("visitDate" in req.body) {
+    updatedState.visitDate = req.body.visitDate || null;
+  }
 
-    // Determine if record is empty
-    const isEmpty =
-      (!updatedState.status) &&
-      (updatedState.rating === undefined || updatedState.rating === null) &&
-      (!updatedState.notes || updatedState.notes.trim() === "") &&
-      !updatedState.visitDate;
+  // Determine if record is empty
+  const isEmpty =
+    (!updatedState.status) &&
+    (updatedState.rating === undefined || updatedState.rating === null) &&
+    (!updatedState.notes || updatedState.notes.trim() === "") &&
+    !updatedState.visitDate;
 
 
-    if (isEmpty) {
-      await UserProgress.findOneAndDelete({ userId, site: site._id });
-      return res.status(200).json({ message: "Progress removed" });
-    }
+  if (isEmpty) {
+    await UserProgress.findOneAndDelete({ userId, site: site._id });
+    return res.status(200).json({ message: "Progress removed" });
+  }
 
-    // Upsert with $set
-    const updated = await UserProgress.findOneAndUpdate(
-      { userId, site: site._id },
-      { $set: updatedState },
-      { returnDocument: "after", upsert: true, runValidators: true }
-    );
+  // Upsert with $set
+  const updated = await UserProgress.findOneAndUpdate(
+    { userId, site: site._id },
+    { $set: updatedState },
+    { returnDocument: "after", upsert: true, runValidators: true }
+  );
 
-    return res.status(200).json(updated);
+  return res.status(200).json(updated);
 }
 
 // GET /progress
@@ -85,7 +87,7 @@ export async function getUserProgress(req, res) {
   const mapped = progress.map(function (doc) {
     const obj = doc.toObject();
     if (obj.site) {
-      obj.site.images = obj.site.images ? obj.site.images.slice(0, 5) : [];
+      obj.site.images = obj.site.images?.slice(0, IMAGE_PREVIEW_LIMIT) || [];
     }
     return obj;
   });
@@ -93,13 +95,13 @@ export async function getUserProgress(req, res) {
   return res.status(200).json(mapped);
 }
 
-// GET /progress/:placeId
+// GET /progress/:slug
 export async function getSingleProgress(req, res) {
   const userId = req.userId;
-  const slug = req.params.placeId;
+  const slug = req.params.slug;
 
   if (!slug) {
-    const err = new Error("placeId is required");
+    const err = new Error("slug is required");
     err.status = 400;
     throw err;
   }
