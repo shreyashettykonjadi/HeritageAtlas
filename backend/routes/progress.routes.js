@@ -16,7 +16,7 @@ router.use(requireAnonymousId);
 router.get("/", asyncHandler(getUserProgress));
 
 // Get single place progress for current user
-router.get("/:placeId", asyncHandler(getSingleProgress));
+router.get("/:slug", asyncHandler(getSingleProgress));
 
 // Create or update progress
 router.post("/", asyncHandler(createOrUpdateProgress));

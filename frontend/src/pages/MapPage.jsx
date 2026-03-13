@@ -1,7 +1,8 @@
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState, useRef, useMemo } from "react"
 import L from "leaflet"
 import "leaflet/dist/leaflet.css"
 import api from "../services/api"
+import useProgress from "../hooks/useProgress"
 import MapModeToggle from "../components/MapModeToggle"
 import SidePanel from "../components/SidePanel"
 
@@ -11,12 +12,21 @@ export default function MapPage() {
   const [selectedSite, setSelectedSite] = useState(null)
   const [sites, setSites] = useState([])
   const [loadingSites, setLoadingSites] = useState(false)
-  const [progressMap, setProgressMap] = useState({})
-  const [loadingProgress, setLoadingProgress] = useState(false)
+  const { data: progressData, loading: loadingProgress } = useProgress()
   const mapRef = useRef(null)   
   const markersRef = useRef(null)
 
-  useEffect(function fetchSites() {   // Fetch site data for map markers on initial load (separately from progress data to optimize loading and allow for independent error handling/loading states if desired in future)
+  const progressMap = useMemo(function () {
+    const map = {};
+    progressData.forEach(function (record) {
+      if (record.site && record.site.slug) {
+        map[record.site.slug] = record.status;
+      }
+    });
+    return map;
+  }, [progressData]);
+
+  useEffect(function fetchSites() {
     async function load() {
       setLoadingSites(true);
       try {
@@ -26,28 +36,6 @@ export default function MapPage() {
         console.error("Failed to fetch sites", error);
       } finally {
         setLoadingSites(false);
-      }
-    }
-
-    load();
-  }, [])
-
-  useEffect(function fetchProgress() {    // Fetch user's progress data on initial load to determine marker colors in "My Journey" mode
-    async function load() {
-      setLoadingProgress(true);
-      try {
-        const response = await api.get("/progress");
-        const map = {};
-        response.data.forEach(function (record) {
-          if (record.site && record.site.slug) {
-            map[record.site.slug] = record.status;
-          }
-        });
-        setProgressMap(map);
-      } catch (error) {
-        console.error("Failed to fetch progress", error);
-      } finally {
-        setLoadingProgress(false);
       }
     }
 

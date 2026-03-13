@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
+import useProgress from "../hooks/useProgress";
 import JourneyCard from "../components/JourneyCard";
 import ConfirmModal from "../components/ui/ConfirmModal";
 
@@ -17,31 +18,17 @@ function SectionHeader({ title, count, icon }) {
 }
 
 export default function MyJourney() {
-  const [visited, setVisited] = useState([]);
-  const [bucket, setBucket] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const { data, loading, error, refresh } = useProgress();
   const [deleteSlug, setDeleteSlug] = useState(null);
   const navigate = useNavigate();
 
-  async function fetchProgressData() {
-    try {
-      const response = await api.get("/progress");
-      const data = response.data;
+  const visited = useMemo(function () {
+    return data.filter(function (r) { return r.status === "visited"; });
+  }, [data]);
 
-      setVisited(data.filter(function (r) { return r.status === "visited"; }));
-      setBucket(data.filter(function (r) { return r.status === "bucket"; }));
-    } catch (err) {
-      console.error("Failed to fetch journey data", err);
-      setError(true);
-    }
-  }
-
-  useEffect(function () {
-    setLoading(true);
-    setError(false);
-    fetchProgressData().finally(function () { setLoading(false); });
-  }, []);
+  const bucket = useMemo(function () {
+    return data.filter(function (r) { return r.status === "bucket"; });
+  }, [data]);
 
   function handleEdit(slug) {
     navigate(`/place/${slug}`);
@@ -57,7 +44,7 @@ export default function MyJourney() {
     try {
       await api.delete(`/progress/${deleteSlug}`);
       setDeleteSlug(null);
-      await fetchProgressData();
+      await refresh();
     } catch (err) {
       console.error("Failed to delete progress", err);
       setDeleteSlug(null);

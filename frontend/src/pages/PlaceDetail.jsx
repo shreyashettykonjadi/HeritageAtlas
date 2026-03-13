@@ -1,129 +1,32 @@
 import { useParams, Link } from "react-router-dom"
-import api from "../services/api";
-import { useEffect, useState } from "react"
+import { useState } from "react"
+import useSite from "../hooks/useSite"
+import useSiteProgress from "../hooks/useSiteProgress"
 import ProgressSection from "../components/ProgressSection"
 
 
 export default function PlaceDetail() {
   const { slug } = useParams()
-
-  const [site, setSite] = useState(null);
-  const [loadingSite, setLoadingSite] = useState(true);
-  const [siteError, setSiteError] = useState(false);
-  const [status, setStatus] = useState("none");
-  const [rating, setRating] = useState(null);
-  const [notes, setNotes] = useState("");
-  const [visitDate, setVisitDate] = useState("");
-  const [loadingProgress, setLoadingProgress] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveState, setSaveState] = useState("idle");
+  const { site, loading: loadingSite, error: siteError } = useSite(slug);
+  const progress = useSiteProgress(slug);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [initialData, setInitialData] = useState(null);
-
-  useEffect(function fetchSite() {// Fetch site details based on slug from URL parameter
-    async function load() {
-      setLoadingSite(true);
-      setSiteError(false);
-      try {
-        const response = await api.get(`/sites/${slug}`);
-        setSite(response.data);
-      } catch (error) {
-        console.error("Failed to fetch site", error);
-        setSiteError(true);
-      } finally {
-        setLoadingSite(false);
-      }
-    }
-
-    load();
-  }, [slug]);
-
-
-  useEffect(function fetchProgress() {    // Fetch user's progress for this site to populate "Your Journey" section and determine initial state of status/rating/notes/visitDate
-    async function load() {
-      try {
-
-        const response = await api.get(`/progress/${slug}`);
-        const data = response.data;
-
-        if (data) {
-          const snapshot = {
-            status: data.status || "none",
-            rating: data.rating || null,
-            notes: data.notes || "",
-            visitDate: data.visitDate ? data.visitDate.split("T")[0] : "",
-          };
-          setStatus(snapshot.status);
-          setRating(snapshot.rating);
-          setNotes(snapshot.notes);
-          setVisitDate(snapshot.visitDate);
-          setInitialData(snapshot);
-        } else {
-          setInitialData({ status: "none", rating: null, notes: "", visitDate: "" });
-        }
-      } catch (error) {
-        setInitialData({ status: "none", rating: null, notes: "", visitDate: "" });
-      } finally {
-        setLoadingProgress(false);
-      }
-    }
-
-    load();
-  }, [slug]);
 
   function handleStatusChange(newStatus) {
-    const next = status === newStatus ? "none" : newStatus;
-    if (next === "bucket" && status === "visited" && (rating || visitDate || notes.trim())) {
+    const next = progress.status === newStatus ? "none" : newStatus;
+    if (next === "bucket" && progress.status === "visited" && (progress.rating || progress.visitDate || progress.notes.trim())) {
       setShowConfirmModal(true);
     } else {
-      setStatus(next);
+      progress.setStatus(next);
     }
   }
 
   function handleConfirmSwitch() {
-    setStatus("bucket");
-    setRating(null);
-    setVisitDate("");
-    setNotes("");
+    progress.setStatus("bucket");
+    progress.setRating(null);
+    progress.setVisitDate("");
+    progress.setNotes("");
     setShowConfirmModal(false);
   }
-
-  async function handleSave() {
-    if (!isDirty || isSaving) return;
-
-    setIsSaving(true);
-    setSaveState("saving");
-
-    try {
-      await api.post("/progress", {
-        placeId: slug,
-        status,
-        rating,
-        notes,
-        visitDate,
-      });
-
-      setInitialData({ status, rating, notes, visitDate });
-      setSaveState("success");
-      setTimeout(function () {
-        setSaveState("idle");
-      }, 2000);
-    } catch (error) {
-      setSaveState("error");
-    } finally {
-      setIsSaving(false);
-    }
-  }
-
-
-  const isDirty =
-    initialData !== null &&
-    (
-      status !== initialData.status ||
-      rating !== initialData.rating ||
-      notes !== initialData.notes ||
-      visitDate !== initialData.visitDate
-    );
 
   if (loadingSite) {
     return (
@@ -217,19 +120,19 @@ export default function PlaceDetail() {
 
           {/* Your Journey Section */}
           <ProgressSection
-            status={status}
+            status={progress.status}
             onStatusChange={handleStatusChange}
-            rating={rating}
-            notes={notes}
-            visitDate={visitDate}
-            setRating={setRating}
-            setNotes={setNotes}
-            setVisitDate={setVisitDate}
-            loadingProgress={loadingProgress}
-            onSave={handleSave}
-            isSaving={isSaving}
-            saveState={saveState}
-            isDirty={isDirty}
+            rating={progress.rating}
+            notes={progress.notes}
+            visitDate={progress.visitDate}
+            setRating={progress.setRating}
+            setNotes={progress.setNotes}
+            setVisitDate={progress.setVisitDate}
+            loadingProgress={progress.loading}
+            onSave={progress.save}
+            isSaving={progress.isSaving}
+            saveState={progress.saveState}
+            isDirty={progress.isDirty}
           />
         </div>
       </div>
