@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import User from "../models/User.js";
+import { generateToken } from "../utils/generateToken.js";
 
 const AUTH_COOKIE_NAME = "auth_token";
 const AUTH_COOKIE_OPTIONS = {
@@ -8,18 +9,6 @@ const AUTH_COOKIE_OPTIONS = {
   secure: process.env.NODE_ENV === "production",
   maxAge: 7 * 24 * 60 * 60 * 1000,
 };
-
-function getAuthTokenFromUtility(req, payload) {
-  const createAuthToken = req.app?.locals?.createAuthToken;
-
-  if (typeof createAuthToken !== "function") {
-    const err = new Error("Auth token utility is not configured");
-    err.status = 500;
-    throw err;
-  }
-
-  return createAuthToken(payload);
-}
 
 // POST /auth/register
 export async function registerUser(req, res) {
@@ -54,7 +43,7 @@ export async function registerUser(req, res) {
     passwordHash,
   });
 
-  const token = getAuthTokenFromUtility(req, { sub: user._id.toString() });
+  const token = generateToken(user._id);
 
   res.cookie(AUTH_COOKIE_NAME, token, AUTH_COOKIE_OPTIONS);
 
@@ -86,7 +75,7 @@ export async function loginUser(req, res) {
     throw err;
   }
 
-  const token = getAuthTokenFromUtility(req, { sub: user._id.toString() });
+  const token = generateToken(user._id);
 
   res.cookie(AUTH_COOKIE_NAME, token, AUTH_COOKIE_OPTIONS);
 
