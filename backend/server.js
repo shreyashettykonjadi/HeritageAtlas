@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
 import progressRoutes from "./routes/progress.routes.js";
 import siteRoutes from "./routes/site.routes.js";
@@ -18,6 +19,7 @@ app.use(
   })
 );
 app.use(express.json({ limit: "10kb" }));
+app.use(cookieParser());
 
 const limiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
