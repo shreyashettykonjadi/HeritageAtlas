@@ -5,12 +5,12 @@ import {
   getSingleProgress,
   deleteProgress,
 } from "../controllers/progress.controller.js";
-import { requireAnonymousId } from "../middleware/anonymous.middleware.js";
+import { requireAuth } from "../middleware/requireAuth.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 const router = express.Router();
 
-router.use(requireAnonymousId);
+router.use(requireAuth);
 
 // Get all progress for current user
 router.get("/", asyncHandler(getUserProgress));
