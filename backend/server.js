@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
+import authRoutes from "./routes/auth.routes.js";
 import progressRoutes from "./routes/progress.routes.js";
 import siteRoutes from "./routes/site.routes.js";
 import rateLimit from "express-rate-limit";
@@ -31,6 +32,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 
+app.use("/auth", authRoutes);
 app.use("/progress", progressRoutes);
 app.use("/sites", siteRoutes);    
 
