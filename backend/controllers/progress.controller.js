@@ -5,7 +5,7 @@ const IMAGE_PREVIEW_LIMIT = 5;
 
 // POST /progress
 export async function createOrUpdateProgress(req, res) {
-  const userId = req.userId;
+  const userId = req.user._id;
   const { placeId } = req.body;
 
   if (!placeId) {
@@ -23,7 +23,7 @@ export async function createOrUpdateProgress(req, res) {
   }
 
   // Fetch existing record (if any)
-  const existing = await UserProgress.findOne({ userId, site: site._id });
+  const existing = await UserProgress.findOne({ user: userId, site: site._id });
 
   // Start from existing values if present
   const current = existing ? existing.toObject() : {};
@@ -62,13 +62,13 @@ export async function createOrUpdateProgress(req, res) {
 
 
   if (isEmpty) {
-    await UserProgress.findOneAndDelete({ userId, site: site._id });
+    await UserProgress.findOneAndDelete({ user: userId, site: site._id });
     return res.status(200).json({ message: "Progress removed" });
   }
 
   // Upsert with $set
   const updated = await UserProgress.findOneAndUpdate(
-    { userId, site: site._id },
+    { user: userId, site: site._id },
     { $set: updatedState },
     { returnDocument: "after", upsert: true, runValidators: true }
   );
@@ -78,9 +78,9 @@ export async function createOrUpdateProgress(req, res) {
 
 // GET /progress
 export async function getUserProgress(req, res) {
-  const userId = req.userId;
+  const userId = req.user._id;
 
-  const progress = await UserProgress.find({ userId })
+  const progress = await UserProgress.find({ user: userId })
     .populate("site", "slug name category country mainImage images")
     .sort({ updatedAt: -1 });
 
@@ -97,7 +97,7 @@ export async function getUserProgress(req, res) {
 
 // GET /progress/:slug
 export async function getSingleProgress(req, res) {
-  const userId = req.userId;
+  const userId = req.user._id;
   const slug = req.params.slug;
 
   if (!slug) {
@@ -112,7 +112,7 @@ export async function getSingleProgress(req, res) {
     return res.status(200).json(null);
   }
 
-  const progress = await UserProgress.findOne({ userId, site: site._id });
+  const progress = await UserProgress.findOne({ user: userId, site: site._id });
 
   // IMPORTANT: return null if not found (NOT 404)
   return res.status(200).json(progress || null);
@@ -121,7 +121,7 @@ export async function getSingleProgress(req, res) {
 // DELETE /progress/:slug
 export async function deleteProgress(req, res) {
   const { slug } = req.params;
-  const userId = req.userId;
+  const userId = req.user._id;
 
   const site = await UnescoSite.findOne({ slug });
 
@@ -132,7 +132,7 @@ export async function deleteProgress(req, res) {
   }
 
   await UserProgress.findOneAndDelete({
-    userId,
+    user: userId,
     site: site._id
   });
 

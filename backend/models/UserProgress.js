@@ -2,10 +2,10 @@ import mongoose from "mongoose";
 
 const userProgressSchema = new mongoose.Schema(
   {
-    userId: {
-      type: String,
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
       required: true,
-      trim: true,
     },
     site: {
       type: mongoose.Schema.Types.ObjectId,
@@ -36,7 +36,7 @@ const userProgressSchema = new mongoose.Schema(
 
 // Prevent duplicate progress per user per place compound index key
 userProgressSchema.index(
-  { userId: 1, site: 1 },
+  { user: 1, site: 1 },
   { unique: true }
 );
 
