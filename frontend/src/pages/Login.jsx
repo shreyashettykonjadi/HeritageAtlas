@@ -15,13 +15,15 @@ export default function Login({ onAuthSuccess }) {
     setError("");
 
     try {
-      const response = await api.post("/auth/login", {
+      await api.post("/auth/login", {
         email,
         password,
       });
 
+      const session = await api.get("/auth/me");
+
       if (onAuthSuccess) {
-        onAuthSuccess(response.data);
+        onAuthSuccess(session.data);
       }
 
       navigate("/");

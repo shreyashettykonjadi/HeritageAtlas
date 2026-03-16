@@ -15,13 +15,15 @@ export default function Register({ onAuthSuccess }) {
     setError("");
 
     try {
-      const response = await api.post("/auth/register", {
+      await api.post("/auth/register", {
         email,
         password,
       });
 
+      const session = await api.get("/auth/me");
+
       if (onAuthSuccess) {
-        onAuthSuccess(response.data);
+        onAuthSuccess(session.data);
       }
 
       navigate("/");
