@@ -9,22 +9,23 @@ import Register from "./pages/Register.jsx"
 import api from "./services/api"
 
 export default function App() {
-  const [authUser, setAuthUser] = useState(null)
-  const [authChecked, setAuthChecked] = useState(false)
+  const [user, setUser] = useState(null)
+  const [authLoading, setAuthLoading] = useState(true)
 
   useEffect(function checkSessionOnLoad() {
     async function loadSession() {
       try {
         const response = await api.get("/auth/me")
-        setAuthUser(response.data)
+        setUser(response.data)
+        setAuthLoading(false)
       } catch (error) {
         if (error?.response?.status === 401) {
-          setAuthUser(null)
+          setUser(null)
+          setAuthLoading(false)
         } else {
           console.error("Failed to verify auth session", error)
+          setAuthLoading(false)
         }
-      } finally {
-        setAuthChecked(true)
       }
     }
 
@@ -32,7 +33,11 @@ export default function App() {
   }, [])
 
   function handleAuthSuccess(user) {
-    setAuthUser(user)
+    setUser(user)
+  }
+
+  if (authLoading) {
+    return <div>Loading...</div>
   }
 
   return (
@@ -41,11 +46,6 @@ export default function App() {
         <Navbar />
 
         <main className="flex-1 flex flex-col">
-          {!authChecked ? (
-            <div className="flex flex-1 items-center justify-center">
-              <div className="w-8 h-8 border-3 border-[#1B4436]/20 border-t-[#1B4436] rounded-full animate-spin" />
-            </div>
-          ) : (
           <Routes>
             <Route path="/" element={<MapPage />} />
             <Route path="/place/:slug" element={<PlaceDetail />} />
@@ -53,7 +53,6 @@ export default function App() {
             <Route path="/login" element={<Login onAuthSuccess={handleAuthSuccess} />} />
             <Route path="/register" element={<Register onAuthSuccess={handleAuthSuccess} />} />
           </Routes>
-          )}
         </main>
       </div>
     </BrowserRouter>
