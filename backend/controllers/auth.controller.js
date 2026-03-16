@@ -87,7 +87,7 @@ export async function loginUser(req, res) {
 
 // GET /auth/me
 export async function getCurrentUser(req, res) {
-  return res.status(200).json(req.user || null);
+  return res.status(200).json(req.user || null); //auth middleware is attaching user
 }
 
 // POST /auth/logout
