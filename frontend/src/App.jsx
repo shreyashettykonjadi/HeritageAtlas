@@ -44,7 +44,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <div className="min-h-screen flex flex-col bg-[#FBF3E4]">
-        <Navbar />
+        <Navbar user={user} />
 
         <main className="flex-1 flex flex-col">
           <Routes>
