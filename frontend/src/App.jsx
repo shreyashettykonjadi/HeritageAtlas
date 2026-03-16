@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import Navbar from "./components/Navbar"
+import ProtectedRoute from "./components/ProtectedRoute"
 import MapPage from "./pages/MapPage.jsx"
 import PlaceDetail from "./pages/PlaceDetail.jsx"
 import MyJourney from "./pages/MyJourney.jsx"
@@ -48,8 +49,22 @@ export default function App() {
         <main className="flex-1 flex flex-col">
           <Routes>
             <Route path="/" element={<MapPage />} />
-            <Route path="/place/:slug" element={<PlaceDetail />} />
-            <Route path="/my-journey" element={<MyJourney />} />
+            <Route
+              path="/place/:slug"
+              element={
+                <ProtectedRoute user={user}>
+                  <PlaceDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/my-journey"
+              element={
+                <ProtectedRoute user={user}>
+                  <MyJourney />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/login" element={<Login onAuthSuccess={handleAuthSuccess} />} />
             <Route path="/register" element={<Register onAuthSuccess={handleAuthSuccess} />} />
           </Routes>
