@@ -102,8 +102,11 @@ export default function SidePanel({ site, onClose }) {
 
             <div className="prose prose-sm prose-p:text-gray-600 prose-headings:text-gray-800">
               <p className="leading-relaxed">
-                Explore this magnificent {site.category.toLowerCase()} UNESCO World Heritage site located in {site.country}.
-                Experience the rich history and breathtaking cultural significance that makes {site.name} unique.
+                {site.shortDescription ||
+                  (site.description && site.description.length > 160
+                    ? site.description.substring(0, 160).replace(/\s+\S*$/, "") + "..."
+                    : site.description) ||
+                  `${site.name} is a UNESCO World Heritage site in ${site.country} known for its ${site.category.toLowerCase()} significance.`}
               </p>
             </div>
           </div>
