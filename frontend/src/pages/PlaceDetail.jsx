@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom"
 import { useState } from "react"
+import { useAuth } from "../context/AuthContext"
 import useSite from "../hooks/useSite"
 import useSiteProgress from "../hooks/useSiteProgress"
 import ProgressSection from "../components/ProgressSection"
@@ -7,11 +8,25 @@ import ProgressSection from "../components/ProgressSection"
 
 export default function PlaceDetail() {
   const { slug } = useParams()
+  const { user, requireAuth } = useAuth()
   const { site, loading: loadingSite, error: siteError } = useSite(slug);
   const progress = useSiteProgress(slug);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   function handleStatusChange(newStatus) {
+    // Auth-gate: prompt login when user tries to mark visited/bucket
+    const reason = newStatus === "visited" ? "visited" : "bucket";
+    const isAuthed = requireAuth(reason, function () {
+      // This runs after successful auth
+      applyStatusChange(newStatus);
+    });
+
+    if (isAuthed) {
+      applyStatusChange(newStatus);
+    }
+  }
+
+  function applyStatusChange(newStatus) {
     const next = progress.status === newStatus ? "none" : newStatus;
     if (next === "bucket" && progress.status === "visited" && (progress.rating || progress.visitDate || progress.notes.trim())) {
       setShowConfirmModal(true);
@@ -26,6 +41,16 @@ export default function PlaceDetail() {
     progress.setVisitDate("");
     progress.setNotes("");
     setShowConfirmModal(false);
+  }
+
+  function handleSave() {
+    const isAuthed = requireAuth("save", function () {
+      progress.save();
+    });
+
+    if (isAuthed) {
+      progress.save();
+    }
   }
 
   if (loadingSite) {
@@ -86,7 +111,7 @@ export default function PlaceDetail() {
 
       {/* Content Container */}
       <div className="max-w-4xl w-full mx-auto px-4 sm:px-8 lg:px-12 -mt-8 relative z-10 pb-16">
-        
+
         {/* Main Info Card */}
         <div className="bg-white rounded-2xl shadow-[0_4px_24px_-4px_rgba(0,0,0,0.1)] border border-gray-100/80 overflow-hidden">
           <div className="p-6 sm:p-10">
@@ -129,7 +154,7 @@ export default function PlaceDetail() {
             setNotes={progress.setNotes}
             setVisitDate={progress.setVisitDate}
             loadingProgress={progress.loading}
-            onSave={progress.save}
+            onSave={handleSave}
             isSaving={progress.isSaving}
             saveState={progress.saveState}
             isDirty={progress.isDirty}

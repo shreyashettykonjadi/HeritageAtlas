@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
 
 export default function useSiteProgress(slug) {
+  const { user } = useAuth();
   const [status, setStatus] = useState("none");
   const [rating, setRating] = useState(null);
   const [notes, setNotes] = useState("");
@@ -13,6 +15,13 @@ export default function useSiteProgress(slug) {
 
   useEffect(function () {
     if (!slug) return;
+
+    // If not logged in, skip fetch and show empty state
+    if (!user) {
+      setInitialData({ status: "none", rating: null, notes: "", visitDate: "" });
+      setLoading(false);
+      return;
+    }
 
     async function load() {
       setLoading(true);
@@ -43,7 +52,7 @@ export default function useSiteProgress(slug) {
     }
 
     load();
-  }, [slug]);
+  }, [slug, user]);
 
   const isDirty =
     initialData !== null &&

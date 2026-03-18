@@ -1,8 +1,9 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import api from "../services/api"
+import { useAuth } from "../context/AuthContext"
 
-export default function Navbar({ user, setUser }) {
+export default function Navbar() {
+  const { user, logout, requireAuth } = useAuth()
   const navigate = useNavigate()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
@@ -12,11 +13,8 @@ export default function Navbar({ user, setUser }) {
     setIsLoggingOut(true)
 
     try {
-      await api.post("/auth/logout")
-      setUser(null)
-      navigate("/login")
-    } catch (error) {
-      console.error("Failed to logout", error)
+      await logout()
+      navigate("/")
     } finally {
       setIsLoggingOut(false)
     }
@@ -29,37 +27,40 @@ export default function Navbar({ user, setUser }) {
           HeritageAtlas
         </Link>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           {user ? (
             <>
               <Link
                 to="/my-journey"
-                className="text-[#1B4436] hover:underline"
+                className="text-sm font-medium text-[#1B4436] hover:text-[#153429] px-3 py-2 rounded-lg hover:bg-[#1B4436]/5 transition-colors"
               >
                 My Journey
               </Link>
+
+              <div className="w-px h-5 bg-[#1B4436]/15" />
+
               <button
                 type="button"
                 onClick={handleLogout}
                 disabled={isLoggingOut}
-                className="text-[#1B4436] hover:underline"
+                className="text-sm font-medium text-gray-500 hover:text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-60"
               >
-                {isLoggingOut ? "Logging out..." : "Logout"}
+                {isLoggingOut ? "Logging out..." : "Log Out"}
               </button>
             </>
           ) : (
             <>
               <Link
                 to="/login"
-                className="text-[#1B4436] hover:underline"
+                className="text-sm font-medium text-[#1B4436] hover:text-[#153429] px-3 py-2 rounded-lg hover:bg-[#1B4436]/5 transition-colors"
               >
-                Login
+                Log In
               </Link>
               <Link
                 to="/register"
-                className="text-[#1B4436] hover:underline"
+                className="text-sm font-semibold text-white bg-[#1B4436] hover:bg-[#153429] px-4 py-2 rounded-xl transition-colors shadow-sm"
               >
-                Register
+                Sign Up
               </Link>
             </>
           )}

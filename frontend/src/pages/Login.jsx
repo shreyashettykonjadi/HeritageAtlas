@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
 
-export default function Login({ onAuthSuccess }) {
+export default function Login() {
   const navigate = useNavigate();
+  const { setUser } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -21,11 +23,7 @@ export default function Login({ onAuthSuccess }) {
       });
 
       const session = await api.get("/auth/me");
-
-      if (onAuthSuccess) {
-        onAuthSuccess(session.data);
-      }
-
+      setUser(session.data);
       navigate("/");
     } catch (err) {
       const message = err?.response?.data?.message || "Login failed. Please try again.";
@@ -38,8 +36,8 @@ export default function Login({ onAuthSuccess }) {
   return (
     <div className="flex flex-1 items-center justify-center px-4 py-10">
       <div className="w-full max-w-md rounded-2xl bg-white border border-gray-100 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.2)] p-6 sm:p-8">
-        <h1 className="text-2xl font-bold text-gray-900">Login</h1>
-        <p className="text-sm text-gray-500 mt-1">Access your Heritage Atlas account.</p>
+        <h1 className="text-2xl font-bold text-gray-900">Welcome back</h1>
+        <p className="text-sm text-gray-500 mt-1">Sign in to your Heritage Atlas account.</p>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
@@ -68,15 +66,15 @@ export default function Login({ onAuthSuccess }) {
           </div>
 
           {error && (
-            <p className="text-sm text-red-600">{error}</p>
+            <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{error}</p>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-2 px-4 py-2.5 rounded-xl font-medium text-white bg-[#1B4436] hover:bg-[#153429] disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+            className="w-full mt-2 px-4 py-2.5 rounded-xl font-semibold text-white bg-[#1B4436] hover:bg-[#153429] disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
           >
-            {loading ? "Signing in..." : "Login"}
+            {loading ? "Signing in..." : "Log In"}
           </button>
         </form>
 

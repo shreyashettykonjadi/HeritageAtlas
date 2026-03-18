@@ -1,12 +1,20 @@
 import { useEffect, useState, useCallback } from "react";
+import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
 
 export default function useProgress() {
+  const { user } = useAuth();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
   const refresh = useCallback(async function () {
+    if (!user) {
+      setData([]);
+      setError(false);
+      return;
+    }
+
     try {
       const response = await api.get("/progress");
       setData(response.data);
@@ -15,7 +23,7 @@ export default function useProgress() {
       console.error("Failed to fetch progress", err);
       setError(true);
     }
-  }, []);
+  }, [user]);
 
   useEffect(function () {
     setLoading(true);

@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
 import useProgress from "../hooks/useProgress";
 import JourneyCard from "../components/JourneyCard";
@@ -17,18 +18,70 @@ function SectionHeader({ title, count, icon }) {
   );
 }
 
+function AuthPrompt() {
+  const { requireAuth } = useAuth();
+
+  function handleSignUp() {
+    requireAuth("journey");
+  }
+
+  function handleLogin() {
+    requireAuth("journey");
+  }
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-6">
+      <div className="w-20 h-20 rounded-full bg-[#1B4436]/10 flex items-center justify-center mb-6">
+        <svg className="w-10 h-10 text-[#1B4436]/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" />
+        </svg>
+      </div>
+      <h1 className="text-2xl font-bold text-gray-900 mb-3">Your journey starts here</h1>
+      <p className="text-gray-500 text-sm max-w-sm mb-8 leading-relaxed">
+        Sign in to see the heritage sites you've visited, your bucket list, and personal notes — all in one place.
+      </p>
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={handleSignUp}
+          className="px-6 py-3 bg-[#1B4436] text-white rounded-xl font-semibold hover:bg-[#153429] transition-colors shadow-sm"
+        >
+          Sign Up Free
+        </button>
+        <button
+          type="button"
+          onClick={handleLogin}
+          className="px-6 py-3 text-[#1B4436] font-medium hover:bg-[#1B4436]/5 rounded-xl transition-colors"
+        >
+          Log In
+        </button>
+      </div>
+      <Link
+        to="/"
+        className="mt-8 text-sm text-gray-400 hover:text-gray-600 transition-colors inline-flex items-center gap-1.5"
+      >
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+        Explore the Map
+      </Link>
+    </div>
+  );
+}
+
 export default function MyJourney() {
+  const { user } = useAuth();
   const { data, loading, error, refresh } = useProgress();
   const [deleteSlug, setDeleteSlug] = useState(null);
   const navigate = useNavigate();
 
-  const visited = useMemo(function () {
-    return data.filter(function (r) { return r.status === "visited"; });
-  }, [data]);
+  // Show auth prompt if not logged in (not a redirect)
+  if (!user) {
+    return <AuthPrompt />;
+  }
 
-  const bucket = useMemo(function () {
-    return data.filter(function (r) { return r.status === "bucket"; });
-  }, [data]);
+  const visited = data.filter(function (r) { return r.status === "visited"; });
+  const bucket = data.filter(function (r) { return r.status === "bucket"; });
 
   function handleEdit(slug) {
     navigate(`/place/${slug}`);
