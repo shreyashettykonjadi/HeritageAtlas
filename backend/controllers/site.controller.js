@@ -4,7 +4,7 @@ import UnescoSite from "../models/UnescoSite.js";
 export async function getMapSites(req, res) {
   const sites = await UnescoSite.find(
     {},
-    { slug: 1, name: 1, country: 1, category: 1, location: 1, _id: 0 }
+    { slug: 1, name: 1, country: 1, category: 1, location: 1, danger: 1, _id: 0 }
   );
 
   return res.status(200).json(sites);

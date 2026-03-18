@@ -1,6 +1,7 @@
 import { useParams, Link } from "react-router-dom"
 import { useState } from "react"
 import { useAuth } from "../context/AuthContext"
+import { getCategoryBadge } from "../constants/categories"
 import useSite from "../hooks/useSite"
 import useSiteProgress from "../hooks/useSiteProgress"
 import ProgressSection from "../components/ProgressSection"
@@ -77,11 +78,6 @@ export default function PlaceDetail() {
     )
   }
 
-  const categoryColors = {
-    Cultural: "bg-amber-50 text-amber-900 border-amber-200",
-    Natural: "bg-emerald-50 text-emerald-900 border-emerald-200",
-    Mixed: "bg-indigo-50 text-indigo-900 border-indigo-200",
-  }
 
   return (
     <div className="flex flex-col bg-[#FAFAF8]">
@@ -119,7 +115,7 @@ export default function PlaceDetail() {
             {/* Metadata Bar */}
             <div className="flex flex-wrap items-center gap-3 mb-8">
               <span
-                className={`inline-flex items-center px-3.5 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider ${categoryColors[site.category] || "bg-gray-100 text-gray-800"}`}
+                className={`inline-flex items-center px-3.5 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider ${getCategoryBadge(site.category)}`}
               >
                 {site.category}
               </span>

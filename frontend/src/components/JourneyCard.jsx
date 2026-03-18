@@ -1,10 +1,5 @@
 import { Link } from "react-router-dom";
-
-const categoryColors = {
-  Cultural: "bg-amber-50 text-amber-900 border-amber-200",
-  Natural: "bg-emerald-50 text-emerald-900 border-emerald-200",
-  Mixed: "bg-indigo-50 text-indigo-900 border-indigo-200",
-};
+import { getCategoryBadge } from "../constants/categories";
 
 export default function JourneyCard({ record, onEdit, onDelete }) {
   const { site, rating, visitDate } = record;
@@ -61,7 +56,7 @@ export default function JourneyCard({ record, onEdit, onDelete }) {
           </div>
         )}
         <span
-          className={`absolute top-3 left-3 inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-semibold uppercase tracking-wider border backdrop-blur-sm ${categoryColors[site.category] || "bg-gray-100 text-gray-800"}`}
+          className={`absolute top-3 left-3 inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-semibold uppercase tracking-wider backdrop-blur-sm ${getCategoryBadge(site.category)}`}
         >
           {site.category}
         </span>

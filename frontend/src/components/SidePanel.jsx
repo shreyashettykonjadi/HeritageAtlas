@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { getCategoryBadge } from "../constants/categories"
 
 export default function SidePanel({ site, onClose }) {
   const [isVisible, setIsVisible] = useState(false)
@@ -30,18 +31,12 @@ export default function SidePanel({ site, onClose }) {
   if (!site) return null
 
 
-  const categoryColors = {
-    Cultural: "bg-amber-50 text-amber-900 border border-amber-200",
-    Natural: "bg-emerald-50 text-emerald-900 border border-emerald-200",
-    Mixed: "bg-indigo-50 text-indigo-900 border border-indigo-200",
-  }
-
-  const categoryColor = categoryColors[site.category] || "bg-gray-50 text-gray-900 border-gray-200"
+  const categoryBadge = getCategoryBadge(site.category)
 
   return (
     <>
       {/* Backdrop for mobile (optional relative to design, but good for focus) */}
-      <div 
+      <div
         className={`fixed inset-0 bg-black/20 backdrop-blur-sm z-999 transition-opacity duration-300 sm:hidden
           ${isVisible ? "opacity-100" : "opacity-0 pointer-events-none"}
         `}
@@ -63,7 +58,7 @@ export default function SidePanel({ site, onClose }) {
         aria-modal="true"
       >
         <div className="flex flex-col h-full relative">
-          
+
           {/* Header Actions */}
           <div className="absolute top-4 right-4 z-10">
             <button
@@ -88,7 +83,7 @@ export default function SidePanel({ site, onClose }) {
           <div className="flex-1 overflow-y-auto p-6 pt-6">
             <div className="space-y-1 mb-6">
               <div className="flex items-center space-x-3 mb-2">
-                <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold tracking-wide uppercase ${categoryColor}`}>
+                <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold tracking-wide uppercase ${categoryBadge}`}>
                   {site.category}
                 </span>
                 <span className="text-sm text-gray-500 font-medium flex items-center">
@@ -99,7 +94,7 @@ export default function SidePanel({ site, onClose }) {
                   {site.country}
                 </span>
               </div>
-              
+
               <h2 id="panel-title" className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
                 {site.name}
               </h2>
@@ -107,7 +102,7 @@ export default function SidePanel({ site, onClose }) {
 
             <div className="prose prose-sm prose-p:text-gray-600 prose-headings:text-gray-800">
               <p className="leading-relaxed">
-                Explore this magnificent {site.category.toLowerCase()} UNESCO World Heritage site located in {site.country}. 
+                Explore this magnificent {site.category.toLowerCase()} UNESCO World Heritage site located in {site.country}.
                 Experience the rich history and breathtaking cultural significance that makes {site.name} unique.
               </p>
             </div>

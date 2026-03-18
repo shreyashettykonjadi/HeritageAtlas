@@ -3,21 +3,24 @@ import L from "leaflet"
 import "leaflet/dist/leaflet.css"
 import api from "../services/api"
 import useProgress from "../hooks/useProgress"
+import { createMarkerIcon } from "../utils/markerFactory"
 import MapModeToggle from "../components/MapModeToggle"
+import MapLegend from "../components/MapLegend"
 import SidePanel from "../components/SidePanel"
 
 export default function MapPage() {
 
-  const [mapMode, setMapMode] = useState("categories")
-  const [selectedSite, setSelectedSite] = useState(null)
-  const [sites, setSites] = useState([])
-  const [loadingSites, setLoadingSites] = useState(false)
-  const { data: progressData, loading: loadingProgress } = useProgress()
-  const mapRef = useRef(null)   
-  const markersRef = useRef(null)
+  var [mapMode, setMapMode] = useState("categories")
+  var [showDanger, setShowDanger] = useState(false)
+  var [selectedSite, setSelectedSite] = useState(null)
+  var [sites, setSites] = useState([])
+  var [loadingSites, setLoadingSites] = useState(false)
+  var { data: progressData } = useProgress()
+  var mapRef = useRef(null)
+  var markersRef = useRef(null)
 
-  const progressMap = useMemo(function () {
-    const map = {};
+  var progressMap = useMemo(function () {
+    var map = {};
     progressData.forEach(function (record) {
       if (record.site && record.site.slug) {
         map[record.site.slug] = record.status;
@@ -26,11 +29,15 @@ export default function MapPage() {
     return map;
   }, [progressData]);
 
+  var dangerCount = useMemo(function () {
+    return sites.filter(function (s) { return s.danger; }).length;
+  }, [sites]);
+
   useEffect(function fetchSites() {
     async function load() {
       setLoadingSites(true);
       try {
-        const response = await api.get("/sites/map");
+        var response = await api.get("/sites/map");
         setSites(response.data);
       } catch (error) {
         console.error("Failed to fetch sites", error);
@@ -38,137 +45,125 @@ export default function MapPage() {
         setLoadingSites(false);
       }
     }
-
     load();
   }, [])
 
-  useEffect(function () {   // Initialize map on first load with custom settings to restrict panning/zooming to world and prevent tile wrapping/repetition
-    // defined bounds for the world
-    const southWest = L.latLng(-85, -180)
-    const northEast = L.latLng(85, 180)
-    const bounds = L.latLngBounds(southWest, northEast)
+  useEffect(function initMap() {
+    var southWest = L.latLng(-85, -180)
+    var northEast = L.latLng(85, 180)
+    var bounds = L.latLngBounds(southWest, northEast)
 
-    const map = L.map("map", {
+    var map = L.map("map", {
       minZoom: 2,
       maxZoom: 8,
-      maxBounds: bounds,         // Restrict panning to world
-      maxBoundsViscosity: 1.0,   // "Solid" elastic bounce-back
-      worldCopyJump: false,      // Disable jumping to cached world copies
+      maxBounds: bounds,
+      maxBoundsViscosity: 1.0,
+      worldCopyJump: false,
+      zoomControl: false,
     })
 
-    // Fit to world view initially
     map.fitBounds(bounds)
+    L.control.zoom({ position: "topright" }).addTo(map)
 
     L.tileLayer(
-      "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+      "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
       {
-        attribution: "&copy; OpenStreetMap & CARTO",
-        noWrap: true,            // Stop tiles from repeating horizontally
-        bounds: bounds,          // Tell tiles not to load outside world
+        attribution: "&copy; OpenStreetMap contributors",
+        noWrap: true,
+        bounds: bounds,
+        maxZoom: 19,
       }
     ).addTo(map)
 
     mapRef.current = map
     markersRef.current = L.layerGroup().addTo(map)
 
-    return function () {
-      map.remove()
-    }
+    return function () { map.remove() }
   }, [])
 
-  useEffect(function () {   // Enable/disable map interactions based on whether a site is selected
+  useEffect(function toggleInteractions() {
     if (!mapRef.current) return
-
     if (selectedSite) {
-      setMapInteractionState(mapRef.current, false)
+      setMapInteraction(mapRef.current, false)
     } else {
-      setMapInteractionState(mapRef.current, true)
+      setMapInteraction(mapRef.current, true)
     }
   }, [selectedSite])
 
-  useEffect(function () {   // Update markers whenever mapMode changes to different color coding or filtering based on user progress
+  useEffect(function renderMarkers() {
     if (!markersRef.current) return
     markersRef.current.clearLayers()
 
     sites.forEach(function (site) {
-      var color = null
-      if (mapMode === "categories") {
-        if (site.category === "Cultural") color = "#A16207"
-        if (site.category === "Natural") color = "#166534"
-        if (site.category === "Mixed") color = "#1E3A8A"
-      }
+      var status = null;
 
       if (mapMode === "journey") {
-        const siteStatus = progressMap[site.slug];
-        if (siteStatus === "visited") color = "#5ac972"
-        else if (siteStatus === "bucket") color = "#9333EA"
-        else return
+        var siteStatus = progressMap[site.slug];
+        if (siteStatus === "visited") {
+          status = "visited";
+        } else if (siteStatus === "bucket") {
+          status = "bucket";
+        } else {
+          return; // not in user's journey
+        }
       }
 
-      L.circleMarker([site.location.coordinates[1], site.location.coordinates[0]], {
-        radius: 6,
-        fillColor: color,
-        color: "#ffffff",
-        weight: 1,
-        fillOpacity: 0.9,
-      })
+      // Danger filter: when on, only show endangered sites
+      if (showDanger && !site.danger) return;
+
+      var icon = createMarkerIcon(site.category, {
+        status: status,
+        danger: showDanger && site.danger,
+      });
+
+      var coords = [site.location.coordinates[1], site.location.coordinates[0]];
+
+      L.marker(coords, { icon: icon })
         .addTo(markersRef.current)
-        .on("click", function () {
-          setSelectedSite(site)
-        })
+        .on("click", function () { setSelectedSite(site) })
     })
-  }, [mapMode, progressMap, sites])
+  }, [mapMode, progressMap, sites, showDanger])
 
-  function setMapInteractionState(map, isEnabled) {   // Enable/disable all map interactions (called when opening/closing side panel)
+  function setMapInteraction(map, enabled) {
     if (!map) return
-
-    if (isEnabled) {
-      map.dragging.enable()
-      map.scrollWheelZoom.enable()
-      map.doubleClickZoom.enable()
-      map.boxZoom.enable()
-      map.keyboard.enable()
-      map.touchZoom.enable()
-      map.zoomControl.enable()
-    } else {
-      map.dragging.disable()
-      map.scrollWheelZoom.disable()
-      map.doubleClickZoom.disable()
-      map.boxZoom.disable()
-      map.keyboard.disable()
-      map.touchZoom.disable()
-      map.zoomControl.disable()
-    }
+    var methods = ["dragging", "scrollWheelZoom", "doubleClickZoom", "boxZoom", "keyboard", "touchZoom"];
+    methods.forEach(function (m) {
+      if (enabled) map[m].enable();
+      else map[m].disable();
+    });
   }
 
   return (
     <div className="flex flex-col flex-1 min-h-0 px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-      
-      {/* Header Controls */}
+
       <div className="flex-none flex items-center justify-between mb-4">
-        <MapModeToggle mapMode={mapMode} setMapMode={setMapMode} />
+        <MapModeToggle
+          mapMode={mapMode}
+          setMapMode={setMapMode}
+          showDanger={showDanger}
+          setShowDanger={setShowDanger}
+          dangerCount={dangerCount}
+        />
+        <span className="text-xs font-medium text-gray-400 tracking-wide">
+          {sites.length > 0 ? sites.length + " sites" : ""}
+        </span>
       </div>
 
-      {/* Map Card */}
-      <div className="flex-1 min-h-0 relative rounded-3xl overflow-hidden shadow-[0_25px_50px_-12px_rgba(27,68,54,0.3)] border-[6px] border-[#FDF6E3] ring-1 ring-[#1B4436]/10"
-           style={{ background: "#CDD2D4" }}>
-        <div id="map" className="absolute inset-0"></div>
-        
-        {/* Subtle inner texture/vignette overlay */}
-        <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_40px_rgba(27,68,54,0.1)] rounded-2xl z-400" />
+      <div className="flex-1 min-h-0 relative rounded-2xl overflow-hidden shadow-lg ring-1 ring-black/5">
+        <div id="map" className="absolute inset-0" />
+        <MapLegend mapMode={mapMode} showDanger={showDanger} />
       </div>
 
-      {/* Overlay */}
       {selectedSite && (
         <div
-          className="fixed inset-0 bg-[#1B4436]/20 backdrop-blur-[2px] z-900 transition-opacity duration-300"
-          onClick={() => setSelectedSite(null)}
+          className="fixed inset-0 bg-black/20 backdrop-blur-[2px] z-[900] transition-opacity duration-300"
+          onClick={function () { setSelectedSite(null) }}
         />
       )}
 
       <SidePanel
         site={selectedSite}
-        onClose={() => setSelectedSite(null)}
+        onClose={function () { setSelectedSite(null) }}
       />
     </div>
   )
