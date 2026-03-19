@@ -5,6 +5,7 @@ import { getCategoryBadge } from "../constants/categories"
 import useSite from "../hooks/useSite"
 import useSiteProgress from "../hooks/useSiteProgress"
 import ProgressSection from "../components/ProgressSection"
+import ImageGallery from "../components/ImageGallery"
 
 
 export default function PlaceDetail() {
@@ -85,32 +86,29 @@ export default function PlaceDetail() {
 
   return (
     <div className="flex flex-col bg-[#FAFAF8]">
-      {/* Hero Section */}
-      <div className="w-full h-[35vh] sm:h-[45vh] bg-linear-to-br from-[#1B4436] via-[#234D3F] to-[#2C5E4F] relative">
-        <div className="absolute inset-0 bg-linear-to-t from-black/40 via-black/10 to-transparent" />
-        <div className="absolute bottom-0 left-0 w-full p-6 sm:p-10 lg:p-14">
-          <div className="max-w-4xl mx-auto">
-            <Link
-              to="/"
-              className="group inline-flex items-center gap-2 text-white/80 hover:text-white mb-6 transition-all duration-200 font-medium text-sm tracking-wide bg-white/10 backdrop-blur-md px-4 py-2.5 rounded-full hover:bg-white/20 border border-white/10"
-            >
-              <svg className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-              </svg>
-              Back to Map
-            </Link>
-            <div className="text-white/70 text-xs sm:text-sm font-semibold tracking-[0.2em] uppercase mb-3">
-              {site.country}
-            </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight leading-[1.1]">
-              {site.name}
-            </h1>
-          </div>
+      {/* Header Section */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-8 lg:px-12 pt-8 pb-6 w-full">
+        <Link
+          to="/"
+          className="group inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 mb-6 transition-colors font-medium text-sm"
+        >
+          <svg className="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to Map
+        </Link>
+        <div className="text-gray-500 text-xs sm:text-sm font-semibold tracking-widest uppercase mb-2">
+          {site.country}
         </div>
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight mb-8">
+          {site.name}
+        </h1>
+
+        <ImageGallery mainImage={site.mainImage} images={site.images} />
       </div>
 
       {/* Content Container */}
-      <div className="max-w-4xl w-full mx-auto px-4 sm:px-8 lg:px-12 -mt-8 relative z-10 pb-16">
+      <div className="max-w-5xl w-full mx-auto px-4 sm:px-8 lg:px-12 relative z-10 pb-16">
 
         {/* Main Info Card */}
         <div className="bg-white rounded-2xl shadow-[0_4px_24px_-4px_rgba(0,0,0,0.1)] border border-gray-100/80 overflow-hidden">

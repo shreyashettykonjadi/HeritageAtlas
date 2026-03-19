@@ -23,7 +23,7 @@ export default function Login() {
       });
 
       const session = await api.get("/auth/me");
-      setUser(session.data);
+      setUser(session?.data ?? null);
       navigate("/");
     } catch (err) {
       const message = err?.response?.data?.message || "Login failed. Please try again.";

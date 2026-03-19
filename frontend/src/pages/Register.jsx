@@ -23,7 +23,7 @@ export default function Register() {
       });
 
       const session = await api.get("/auth/me");
-      setUser(session.data);
+      setUser(session?.data ?? null);
       navigate("/");
     } catch (err) {
       const message = err?.response?.data?.message || "Registration failed. Please try again.";

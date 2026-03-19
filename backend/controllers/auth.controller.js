@@ -5,8 +5,8 @@ import { generateToken } from "../utils/generateToken.js";
 const AUTH_COOKIE_NAME = "auth_token";
 const AUTH_COOKIE_OPTIONS = {
   httpOnly: true,
-  sameSite: "lax",
-  secure: process.env.NODE_ENV === "production",
+  sameSite: "None",
+  secure: true,
   maxAge: 7 * 24 * 60 * 60 * 1000,
 };
 

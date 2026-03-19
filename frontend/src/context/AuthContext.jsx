@@ -40,15 +40,31 @@ export function AuthProvider({ children }) {
         async function loadSession() {
             try {
                 const response = await api.get("/auth/me");
-                setUser(response.data);
+                setUser(response?.data ?? null);
             } catch (error) {
-                setUser(null);
+                if (error?.response?.status === 401 || error?.isExpectedAuthError) {
+                    setUser(null);
+                } else {
+                    console.error("Unexpected auth session check failure", error);
+                    setUser(null);
+                }
             } finally {
                 setAuthLoading(false);
             }
         }
 
         loadSession();
+    }, []);
+
+    // Listen for unauthorized events globally (from axios interceptor)
+    useEffect(function setupAuthInterceptorListener() {
+        function handleUnauthorized() {
+            setUser(null);
+        }
+        window.addEventListener("auth:unauthorized", handleUnauthorized);
+        return function () {
+            window.removeEventListener("auth:unauthorized", handleUnauthorized);
+        };
     }, []);
 
     // Open auth modal with context-aware messaging

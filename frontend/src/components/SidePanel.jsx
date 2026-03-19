@@ -72,10 +72,24 @@ export default function SidePanel({ site, onClose }) {
             </button>
           </div>
 
-          {/* Hero / Cover (Use map placeholder or gradient if no image) */}
-          <div className="h-32 bg-linear-to-br from-[#1B4436] to-[#2C5E4F] relative shrink-0">
-            <div className="absolute bottom-4 left-6 text-white/90 text-xs font-medium tracking-widest uppercase opacity-80">
-              Unesco World Heritage
+          {/* Hero / Cover Image */}
+          <div className="h-48 bg-gray-100 relative shrink-0 overflow-hidden">
+            {site.mainImage ? (
+              <img
+                src={site.mainImage}
+                alt={site.name}
+                loading="lazy"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-linear-to-br from-[#1B4436] to-[#2C5E4F] flex items-center justify-center">
+                <span className="text-white/50 text-xs tracking-widest uppercase">No Image</span>
+              </div>
+            )}
+            {/* Gradient Overlay for Text Visibility */}
+            <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+            <div className="absolute bottom-4 left-6 text-white/90 text-[10px] font-bold tracking-[0.15em] uppercase z-10 shadow-sm">
+              UNESCO World Heritage
             </div>
           </div>
 
