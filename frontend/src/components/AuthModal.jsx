@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import api from "../services/api";
+import api, { getApiData } from "../services/api";
 
 export default function AuthModal() {
     const {
@@ -54,7 +54,7 @@ export default function AuthModal() {
             await api.post(endpoint, { email, password });
 
             const session = await api.get("/auth/me");
-            handleAuthSuccess(session.data);
+            handleAuthSuccess(getApiData(session));
         } catch (err) {
             const message =
                 err?.response?.data?.message ||

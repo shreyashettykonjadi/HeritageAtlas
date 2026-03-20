@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import api from "../services/api";
+import api, { getApiData } from "../services/api";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -23,7 +23,7 @@ export default function Login() {
       });
 
       const session = await api.get("/auth/me");
-      setUser(session?.data ?? null);
+      setUser(getApiData(session));
       navigate("/");
     } catch (err) {
       const message = err?.response?.data?.message || "Login failed. Please try again.";

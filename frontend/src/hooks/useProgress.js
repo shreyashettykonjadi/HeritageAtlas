@@ -20,6 +20,12 @@ export default function useProgress() {
       setData(response.data);
       setError(false);
     } catch (err) {
+      if (err?.response?.status === 401 || err?.isExpectedAuthError) {
+        setData([]);
+        setError(false);
+        return;
+      }
+
       console.error("Failed to fetch progress", err);
       setError(true);
     }

@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
-import api from "../services/api";
+import api, { getApiData } from "../services/api";
 
 const AuthContext = createContext(null);
 
@@ -40,7 +40,7 @@ export function AuthProvider({ children }) {
         async function loadSession() {
             try {
                 const response = await api.get("/auth/me");
-                setUser(response?.data ?? null);
+                setUser(getApiData(response));
             } catch (error) {
                 if (error?.response?.status === 401 || error?.isExpectedAuthError) {
                     setUser(null);
