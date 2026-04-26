@@ -2,6 +2,14 @@ import { useState } from "react";
 import ImageModal from "./ImageModal";
 
 const FALLBACK_IMAGE_SRC = "/fallback.jpg";
+const INITIAL_LOAD = 4;
+
+function optimizeWikiImage(url) {
+    if (typeof url === "string" && url.includes("upload.wikimedia.org")) {
+        return url.includes("?") ? url + "&width=800" : url + "?width=800";
+    }
+    return url;
+}
 
 function handleImageError(event) {
     const target = event.currentTarget;
@@ -14,12 +22,20 @@ function handleImageError(event) {
     target.src = FALLBACK_IMAGE_SRC;
 }
 
-export default function ImageGallery({ mainImage, images }) {
-    // Merge images so mainImage is always first, keeping unique values
-    const allImages = Array.from(new Set([mainImage, ...(images || [])].filter(Boolean)));
+function ImageSkeleton() {
+    return (
+        <div className="w-full h-full bg-linear-to-r from-gray-200 via-gray-100 to-gray-200 animate-pulse rounded-xl" />
+    );
+}
+
+export default function ImageGallery({ mainImage, images, isLoading = false }) {
+    // Merge images so mainImage is always first, keeping unique values. Also optimize Wikimedia sizes.
+    const allImages = Array.from(new Set([mainImage, ...(images || [])].filter(Boolean))).map(optimizeWikiImage);
 
     const [modalOpen, setModalOpen] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [loadedImages, setLoadedImages] = useState(new Set());
+    const [visibleCount, setVisibleCount] = useState(INITIAL_LOAD);
 
     function openModal(index) {
         setCurrentIndex(index);
@@ -34,18 +50,33 @@ export default function ImageGallery({ mainImage, images }) {
         }
     }
 
+    function handleImageLoad(index) {
+        setLoadedImages((prev) => new Set([...prev, index]));
+    }
+
+    if (allImages.length === 0 && isLoading) {
+        return (
+            <div className="w-full h-[420px] rounded-xl overflow-hidden">
+                <ImageSkeleton />
+            </div>
+        );
+    }
+
     if (allImages.length === 0) return null;
 
     // Single image fallback: Full hero only
     if (allImages.length === 1) {
         return (
-            <div className="w-full h-64 sm:h-80 lg:h-96 rounded-2xl overflow-hidden cursor-pointer group">
+            <div className="w-full h-[420px] rounded-xl overflow-hidden cursor-pointer group bg-gray-100">
+                {!loadedImages.has(0) && isLoading && <ImageSkeleton />}
                 <img
                     src={allImages[0]}
                     alt="Site view main"
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    className="w-full h-full object-cover transition hover:scale-105"
                     onClick={() => openModal(0)}
                     onError={handleImageError}
+                    onLoad={() => handleImageLoad(0)}
+                    loading="eager"
                 />
                 {modalOpen && (
                     <ImageModal
@@ -59,57 +90,66 @@ export default function ImageGallery({ mainImage, images }) {
         );
     }
 
-    // Multiple images: Hero + Grid Layout (Airbnb style)
     const heroImage = allImages[0];
-    const gridImages = allImages.slice(1, 5); // Take max 4 images for the grid
-    const remainingCount = Math.max(0, allImages.length - 5);
+    const galleryImages = allImages.slice(1, visibleCount + 1);
+    const unshownCount = allImages.length - 1 - visibleCount;
 
     return (
-        <div className="w-full h-64 sm:h-80 lg:h-96 grid grid-cols-1 md:grid-cols-2 gap-2 rounded-2xl overflow-hidden cursor-pointer group/container bg-gray-100">
-
-            {/* Left Box (Hero) */}
-            <div className="relative h-full overflow-hidden group/item" onClick={() => openModal(0)}>
+        <div className="space-y-4">
+            {/* HERO */}
+            <div 
+                className="w-full h-[420px] cursor-pointer rounded-xl overflow-hidden group relative bg-gray-100"
+                onClick={() => openModal(0)}
+            >
+                {!loadedImages.has(0) && <ImageSkeleton />}
                 <img
                     src={heroImage}
                     alt="Hero view"
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-105"
+                    className="w-full h-full object-cover transition hover:scale-105"
                     onError={handleImageError}
+                    onLoad={() => handleImageLoad(0)}
+                    loading="eager"
                 />
-                <div className="absolute inset-0 bg-black/10 transition-opacity duration-300 group-hover/container:opacity-100 opacity-0 group-hover/item:opacity-0" />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300" />
             </div>
 
-            {/* Right Box (Grid) */}
-            <div className={`hidden md:grid gap-2 h-full ${gridImages.length === 1 ? "grid-cols-1" : "grid-cols-2"} ${gridImages.length > 2 ? "grid-rows-2" : "grid-rows-1"}`}>
-                {gridImages.map((img, idx) => {
-                    const absoluteIndex = idx + 1;
-                    const isLast = idx === gridImages.length - 1;
-                    const displayOverlay = isLast && remainingCount > 0;
+            {/* FLEXIBLE GRID */}
+            {galleryImages.length > 0 && (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                    {galleryImages.map((img, idx) => {
+                        const absoluteIndex = idx + 1;
 
-                    return (
-                        <div key={idx} className="relative h-full overflow-hidden group/item" onClick={() => openModal(absoluteIndex)}>
-                            <img
-                                src={img}
-                                alt={`Gallery view ${absoluteIndex}`}
-                                loading="lazy"
-                                className="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-105"
-                                onError={handleImageError}
-                            />
+                        return (
+                            <div
+                                key={absoluteIndex}
+                                className="aspect-square overflow-hidden rounded-xl cursor-pointer group relative bg-gray-100"
+                                onClick={() => openModal(absoluteIndex)}
+                            >
+                                {!loadedImages.has(absoluteIndex) && <ImageSkeleton />}
+                                <img
+                                    src={img}
+                                    alt={`Gallery view ${absoluteIndex}`}
+                                    className="w-full h-full object-cover transition hover:scale-105"
+                                    onError={handleImageError}
+                                    onLoad={() => handleImageLoad(absoluteIndex)}
+                                    loading="lazy"
+                                />
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300" />
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
 
-                            {/* Dim inactive grid items on hover */}
-                            <div className="absolute inset-0 bg-black/10 transition-opacity duration-300 group-hover/container:opacity-100 opacity-0 group-hover/item:opacity-0" />
-
-                            {/* Show "+X more" overlay on the last mapped image if remaining images exist */}
-                            {displayOverlay && (
-                                <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center transition-colors duration-300 hover:bg-black/50">
-                                    <span className="text-white text-lg font-semibold tracking-wide shadow-sm">
-                                        +{remainingCount} more
-                                    </span>
-                                </div>
-                            )}
-                        </div>
-                    );
-                })}
-            </div>
+            {/* LOAD MORE BUTTON */}
+            {unshownCount > 0 && (
+                <button 
+                    onClick={() => setVisibleCount((v) => v + 4)}
+                    className="w-full py-3.5 mt-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-colors active:scale-[0.99]"
+                >
+                    Load More ({unshownCount})
+                </button>
+            )}
 
             {modalOpen && (
                 <ImageModal

@@ -39,10 +39,33 @@ export default function PlaceDetail() {
   const progress = useSiteProgress(slug);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [images, setImages] = useState([]);
+  const [isLoadingImages, setIsLoadingImages] = useState(true);
   const fallbackText = `${site?.name} is a UNESCO World Heritage site in ${site?.country} known for its ${site?.category?.toLowerCase()} significance.`;
   const cleanDescription = site?.shortDescription ||
     (site?.description ? (site.description.length > 350 ? trimToWordBoundary(site.description, 350) + "..." : site.description) : null) ||
     fallbackText;
+
+  // Select main image: Hero = ONLY mainImage
+  const mainImage = site?.mainImage || "/fallback.jpg";
+
+  // Preload hero image eagerly
+  useEffect(() => {
+    if (mainImage && mainImage !== "/fallback.jpg") {
+      const img = new Image();
+      img.src = mainImage;
+    }
+  }, [mainImage]);
+
+  function isBlockedUnesco(url) {
+    return typeof url === "string" && url.includes("whc.unesco.org/document");
+  }
+
+  function isRelevantImage(url, siteName) {
+    if (!url || !siteName) return false;
+    // Normalize to handle non-alphanumeric chars (like commas/accents) often stripped in URLs
+    const normalized = siteName.toLowerCase().replace(/[^a-z0-9]/gi, "");
+    return url.toLowerCase().replace(/[^a-z0-9]/gi, "").includes(normalized);
+  }
 
   useEffect(function () {
     let isCancelled = false;
@@ -50,20 +73,47 @@ export default function PlaceDetail() {
     async function loadImages() {
       if (!site) {
         setImages([]);
+        setIsLoadingImages(false);
         return;
       }
 
-      const query = `${site.name} ${site.country} monument`;
-      const wikiImages = await fetchWikimediaImages(query);
-      console.log("Wikimedia images:", wikiImages);
+      setIsLoadingImages(true);
+      
+      // PART 2 - Improve Query (CRITICAL)
+      const query = `"${site.name}" ${site.country} UNESCO World Heritage`;
+      const wikiImages = await fetchWikimediaImages(query, site.name);
+      
+      console.log("Wikimedia images fetched:", wikiImages.length, "total");
 
-      const combined = [...wikiImages];
+      // PART 3 - Strict Filtering
+      const filteredWikiImages = wikiImages.filter((img) =>
+        isRelevantImage(img, site.name)
+      );
 
-      const uniqueImages = Array.from(new Set(combined.filter(Boolean)));
-      const shuffledImages = shuffleArray(uniqueImages);
+      // CLEAN IMAGE PIPELINE (CRITICAL) - completely remove `site.images`
+      const mergedPipeline = [
+        site.mainImage,
+        ...filteredWikiImages
+      ];
+
+      const cleanImages = [...new Set(mergedPipeline)].filter(
+        (img) =>
+          typeof img === "string" &&
+          img.startsWith("http") &&
+          !isBlockedUnesco(img) &&
+          !img.includes("thumb") &&
+          !img.includes("fallback") &&
+          !img.includes("full-resolution")
+      );
+
+      // ENSURE MINIMUM UI
+      const finalImages = cleanImages.length > 0 ? cleanImages : [site.mainImage];
+
+      console.log("FINAL CLEAN:", finalImages);
 
       if (!isCancelled) {
-        setImages(shuffledImages);
+        setImages(finalImages);
+        setIsLoadingImages(false);
       }
     }
 
@@ -74,11 +124,7 @@ export default function PlaceDetail() {
     };
   }, [site]);
 
-  const mainImage = images.length > 0
-    ? images[Math.floor(Math.random() * images.length)]
-    : "/fallback.jpg";
-
-  const galleryImages = images.slice(0, 6);
+  const galleryImages = images;
 
   function handleStatusChange(newStatus) {
     // Auth-gate: prompt login when user tries to mark visited/bucket
@@ -165,7 +211,7 @@ export default function PlaceDetail() {
           {site.name}
         </h1>
 
-        <ImageGallery mainImage={mainImage} images={galleryImages} />
+        <ImageGallery mainImage={mainImage} images={galleryImages} isLoading={isLoadingImages} />
       </div>
 
       {/* Content Container */}
