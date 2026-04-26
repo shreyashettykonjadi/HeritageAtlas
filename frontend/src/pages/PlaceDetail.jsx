@@ -7,6 +7,16 @@ import useSiteProgress from "../hooks/useSiteProgress"
 import ProgressSection from "../components/ProgressSection"
 import ImageGallery from "../components/ImageGallery"
 
+function trimToWordBoundary(text, maxLength) {
+  if (!text || text.length <= maxLength) {
+    return text
+  }
+
+  const truncated = text.slice(0, maxLength)
+  const lastSpace = truncated.lastIndexOf(" ")
+  return lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated
+}
+
 
 export default function PlaceDetail() {
   const { slug } = useParams()
@@ -16,7 +26,7 @@ export default function PlaceDetail() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const fallbackText = `${site?.name} is a UNESCO World Heritage site in ${site?.country} known for its ${site?.category?.toLowerCase()} significance.`;
   const cleanDescription = site?.shortDescription ||
-    (site?.description ? (site.description.length > 350 ? site.description.substring(0, 350).replace(/\s+\S*$/, "") + "..." : site.description) : null) ||
+    (site?.description ? (site.description.length > 350 ? trimToWordBoundary(site.description, 350) + "..." : site.description) : null) ||
     fallbackText;
 
   function handleStatusChange(newStatus) {

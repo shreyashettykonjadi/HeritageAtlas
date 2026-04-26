@@ -3,6 +3,16 @@ import { useNavigate } from "react-router-dom"
 import { getCategoryBadge } from "../constants/categories"
 import { toSafeSlugSegment } from "../utils/slug"
 
+function trimToWordBoundary(text, maxLength) {
+  if (!text || text.length <= maxLength) {
+    return text
+  }
+
+  const truncated = text.slice(0, maxLength)
+  const lastSpace = truncated.lastIndexOf(" ")
+  return lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated
+}
+
 export default function SidePanel({ site, onClose }) {
   const [isVisible, setIsVisible] = useState(false)
   const navigate = useNavigate()
@@ -124,7 +134,7 @@ export default function SidePanel({ site, onClose }) {
               <p className="leading-relaxed">
                 {site.shortDescription ||
                   (site.description && site.description.length > 160
-                    ? site.description.substring(0, 160).replace(/\s+\S*$/, "") + "..."
+                    ? trimToWordBoundary(site.description, 160) + "..."
                     : site.description) ||
                   `${site.name} is a UNESCO World Heritage site in ${site.country} known for its ${site.category.toLowerCase()} significance.`}
               </p>

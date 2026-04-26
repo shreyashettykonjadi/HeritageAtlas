@@ -3,14 +3,43 @@ import path from "path";
 import { parse } from "csv-parse/sync";
 
 function slugify(text) {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/['"]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/[^a-z0-9-]/g, "")
-    .replace(/-+/g, "-")
-    .replace(/^-+|-+$/g, "");
+  if (!text || typeof text !== "string") {
+    return "";
+  }
+
+  const input = text.toLowerCase().trim();
+  let slug = "";
+  let previousWasDash = false;
+
+  for (let i = 0; i < input.length; i += 1) {
+    const char = input[i];
+    const code = input.charCodeAt(i);
+    const isLowercaseLetter = code >= 97 && code <= 122;
+    const isDigit = code >= 48 && code <= 57;
+    const isQuote = char === "'" || char === '"';
+    const isDashLike = char === "-" || char === " " || char === "\t" || char === "\n" || char === "\r";
+
+    if (isQuote) {
+      continue;
+    }
+
+    if (isLowercaseLetter || isDigit) {
+      slug += char;
+      previousWasDash = false;
+      continue;
+    }
+
+    if (isDashLike && slug.length > 0 && !previousWasDash) {
+      slug += "-";
+      previousWasDash = true;
+    }
+  }
+
+  if (slug.endsWith("-")) {
+    return slug.slice(0, -1);
+  }
+
+  return slug;
 }
 
 function normalizeCategory(raw) {
