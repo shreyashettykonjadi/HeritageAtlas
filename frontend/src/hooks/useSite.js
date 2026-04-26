@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
+import { toSafeSlugSegment } from "../utils/slug";
 
 export default function useSite(slug) {
   const [site, setSite] = useState(null);
@@ -7,13 +8,19 @@ export default function useSite(slug) {
   const [error, setError] = useState(false);
 
   useEffect(function () {
-    if (!slug) return;
+    const safeSlugSegment = toSafeSlugSegment(slug);
+    if (!safeSlugSegment) {
+      setSite(null);
+      setError(true);
+      setLoading(false);
+      return;
+    }
 
     async function load() {
       setLoading(true);
       setError(false);
       try {
-        const response = await api.get(`/sites/${slug}`);
+        const response = await api.get(`/sites/${safeSlugSegment}`);
         setSite(response.data);
       } catch (err) {
         console.error("Failed to fetch site", err);

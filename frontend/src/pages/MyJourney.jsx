@@ -5,6 +5,7 @@ import api from "../services/api";
 import useProgress from "../hooks/useProgress";
 import JourneyCard from "../components/JourneyCard";
 import ConfirmModal from "../components/ui/ConfirmModal";
+import { sanitizeSlug, toSafeSlugSegment } from "../utils/slug";
 
 function SectionHeader({ title, count, icon }) {
   return (
@@ -84,18 +85,29 @@ export default function MyJourney() {
   const bucket = data.filter(function (r) { return r.status === "bucket"; });
 
   function handleEdit(slug) {
-    navigate(`/place/${slug}`);
+    const safeSlugSegment = toSafeSlugSegment(slug);
+    if (!safeSlugSegment) {
+      return;
+    }
+
+    navigate(`/place/${safeSlugSegment}`);
   }
 
   function handleDeleteRequest(slug) {
-    setDeleteSlug(slug);
+    const validSlug = sanitizeSlug(slug);
+    if (!validSlug) {
+      return;
+    }
+
+    setDeleteSlug(validSlug);
   }
 
   async function handleDeleteConfirm() {
-    if (!deleteSlug) return;
+    const safeSlugSegment = toSafeSlugSegment(deleteSlug);
+    if (!safeSlugSegment) return;
 
     try {
-      await api.delete(`/progress/${deleteSlug}`);
+      await api.delete(`/progress/${safeSlugSegment}`);
       setDeleteSlug(null);
       await refresh();
     } catch (err) {

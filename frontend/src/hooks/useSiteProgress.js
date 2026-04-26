@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
+import { sanitizeSlug, toSafeSlugSegment } from "../utils/slug";
 
 export default function useSiteProgress(slug) {
   const { user } = useAuth();
@@ -14,7 +15,12 @@ export default function useSiteProgress(slug) {
   const [initialData, setInitialData] = useState(null);
 
   useEffect(function () {
-    if (!slug) return;
+    const safeSlugSegment = toSafeSlugSegment(slug);
+    if (!safeSlugSegment) {
+      setInitialData({ status: "none", rating: null, notes: "", visitDate: "" });
+      setLoading(false);
+      return;
+    }
 
     // If not logged in, skip fetch and show empty state
     if (!user) {
@@ -26,7 +32,7 @@ export default function useSiteProgress(slug) {
     async function load() {
       setLoading(true);
       try {
-        const response = await api.get(`/progress/${slug}`);
+        const response = await api.get(`/progress/${safeSlugSegment}`);
         const data = response.data;
 
         if (data) {
@@ -66,12 +72,18 @@ export default function useSiteProgress(slug) {
   async function save() {
     if (!isDirty || isSaving) return;
 
+    const validSlug = sanitizeSlug(slug);
+    if (!validSlug) {
+      setSaveState("error");
+      return;
+    }
+
     setIsSaving(true);
     setSaveState("saving");
 
     try {
       await api.post("/progress", {
-        placeId: slug,
+        placeId: validSlug,
         status,
         rating,
         notes,

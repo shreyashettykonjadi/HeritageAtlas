@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { getCategoryBadge } from "../constants/categories"
+import { toSafeSlugSegment } from "../utils/slug"
 
 export default function SidePanel({ site, onClose }) {
   const [isVisible, setIsVisible] = useState(false)
@@ -21,10 +22,15 @@ export default function SidePanel({ site, onClose }) {
   }
 
   function handleViewDetails() {
+    const safeSlugSegment = toSafeSlugSegment(site?.slug)
+    if (!safeSlugSegment) {
+      return
+    }
+
     setIsVisible(false)
     setTimeout(function () {
       onClose()
-      navigate(`/place/${site.slug}`)
+      navigate(`/place/${safeSlugSegment}`)
     }, 300)
   }
 

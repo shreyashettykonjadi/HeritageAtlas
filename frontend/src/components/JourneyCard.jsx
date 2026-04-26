@@ -1,13 +1,16 @@
 import { Link } from "react-router-dom";
 import { getCategoryBadge } from "../constants/categories";
+import { sanitizeSlug, toSafeSlugSegment } from "../utils/slug";
 
 export default function JourneyCard({ record, onEdit, onDelete }) {
   const { site, rating, visitDate } = record;
   const image = site.mainImage || (site.images && site.images[0]) || null;
+  const safeSlugSegment = toSafeSlugSegment(site?.slug);
+  const placePath = safeSlugSegment ? `/place/${safeSlugSegment}` : "/";
 
   return (
     <Link
-      to={`/place/${site.slug}`}
+      to={placePath}
       className="group relative bg-white rounded-2xl shadow-[0_2px_12px_-4px_rgba(0,0,0,0.08)] border border-gray-100/80 overflow-hidden hover:shadow-[0_8px_30px_-8px_rgba(0,0,0,0.12)] transition-all duration-300"
     >
       {/* Actions Container - Hover reveals */}
@@ -16,7 +19,12 @@ export default function JourneyCard({ record, onEdit, onDelete }) {
           onClick={function (e) {
             e.preventDefault();
             e.stopPropagation();
-            onEdit(site.slug);
+            const validSlug = sanitizeSlug(site?.slug);
+            if (!validSlug) {
+              return;
+            }
+
+            onEdit(validSlug);
           }}
           className="bg-white/90 hover:bg-white text-gray-700 p-2 rounded-lg backdrop-blur-[2px] shadow-sm transition-colors"
           title="Edit"
@@ -29,7 +37,12 @@ export default function JourneyCard({ record, onEdit, onDelete }) {
           onClick={function (e) {
             e.preventDefault();
             e.stopPropagation();
-            onDelete(site.slug);
+            const validSlug = sanitizeSlug(site?.slug);
+            if (!validSlug) {
+              return;
+            }
+
+            onDelete(validSlug);
           }}
           className="bg-white/90 hover:bg-red-50 text-red-600 p-2 rounded-lg backdrop-blur-[2px] shadow-sm transition-colors"
           title="Remove"
