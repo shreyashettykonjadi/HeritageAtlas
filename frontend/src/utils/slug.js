@@ -1,21 +1,15 @@
 const SLUG_REGEX = /^[a-z0-9-]+$/;
 
+export function isValidSlug(slug) {
+  return typeof slug === "string" && SLUG_REGEX.test(slug.trim());
+}
+
 export function sanitizeSlug(rawSlug) {
-  if (typeof rawSlug !== "string") {
+  if (!isValidSlug(rawSlug)) {
     return null;
   }
 
-  const trimmedSlug = rawSlug.trim();
-
-  if (!trimmedSlug) {
-    return null;
-  }
-
-  if (!SLUG_REGEX.test(trimmedSlug)) {
-    return null;
-  }
-
-  return trimmedSlug;
+  return rawSlug.trim();
 }
 
 export function toSafeSlugSegment(rawSlug) {

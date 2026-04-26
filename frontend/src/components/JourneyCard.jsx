@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { getCategoryBadge } from "../constants/categories";
-import { sanitizeSlug, toSafeSlugSegment } from "../utils/slug";
+import { isValidSlug, toSafeSlugSegment } from "../utils/slug";
 
 export default function JourneyCard({ record, onEdit, onDelete }) {
   const { site, rating, visitDate } = record;
@@ -19,12 +19,11 @@ export default function JourneyCard({ record, onEdit, onDelete }) {
           onClick={function (e) {
             e.preventDefault();
             e.stopPropagation();
-            const validSlug = sanitizeSlug(site?.slug);
-            if (!validSlug) {
+            if (!isValidSlug(site?.slug)) {
               return;
             }
 
-            onEdit(validSlug);
+            onEdit(site.slug.trim());
           }}
           className="bg-white/90 hover:bg-white text-gray-700 p-2 rounded-lg backdrop-blur-[2px] shadow-sm transition-colors"
           title="Edit"
@@ -37,12 +36,11 @@ export default function JourneyCard({ record, onEdit, onDelete }) {
           onClick={function (e) {
             e.preventDefault();
             e.stopPropagation();
-            const validSlug = sanitizeSlug(site?.slug);
-            if (!validSlug) {
+            if (!isValidSlug(site?.slug)) {
               return;
             }
 
-            onDelete(validSlug);
+            onDelete(site.slug.trim());
           }}
           className="bg-white/90 hover:bg-red-50 text-red-600 p-2 rounded-lg backdrop-blur-[2px] shadow-sm transition-colors"
           title="Remove"
