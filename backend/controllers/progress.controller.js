@@ -2,17 +2,36 @@ import UserProgress from "../models/UserProgress.js";
 import UnescoSite from "../models/UnescoSite.js";
 
 const IMAGE_PREVIEW_LIMIT = 5;
+const PLACE_ID_REGEX = /^[a-z0-9-]+$/;
 
-// POST /progress
-export async function createOrUpdateProgress(req, res) {
-  const userId = req.user._id;
-  const { placeId } = req.body;
+function sanitizePlaceId(rawPlaceId) {
+  if (typeof rawPlaceId !== "string") {
+    const err = new Error("placeId must be a string");
+    err.status = 400;
+    throw err;
+  }
+
+  const placeId = rawPlaceId.trim();
 
   if (!placeId) {
     const err = new Error("placeId is required");
     err.status = 400;
     throw err;
   }
+
+  if (!PLACE_ID_REGEX.test(placeId)) {
+    const err = new Error("Invalid placeId format");
+    err.status = 400;
+    throw err;
+  }
+
+  return placeId;
+}
+
+// POST /progress
+export async function createOrUpdateProgress(req, res) {
+  const userId = req.user._id;
+  const placeId = sanitizePlaceId(req.body?.placeId);
 
   // Resolve slug → ObjectId
   const site = await UnescoSite.findOne({ slug: placeId });
