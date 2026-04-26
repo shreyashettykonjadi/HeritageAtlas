@@ -1,5 +1,18 @@
 import { useEffect } from "react";
 
+const FALLBACK_IMAGE_SRC = "/fallback.jpg";
+
+function handleImageError(event) {
+    const target = event.currentTarget;
+
+    if (target.dataset.fallbackApplied === "true") {
+        return;
+    }
+
+    target.dataset.fallbackApplied = "true";
+    target.src = FALLBACK_IMAGE_SRC;
+}
+
 export default function ImageModal({ images, currentIndex, onClose, onNavigate }) {
     // Navigation keybindings (ES6 native event listeners)
     useEffect(function () {
@@ -48,6 +61,7 @@ export default function ImageModal({ images, currentIndex, onClose, onNavigate }
                 alt={`Gallery view ${currentIndex + 1}`}
                 className="max-h-[85vh] max-w-full rounded-lg object-contain select-none"
                 draggable="false"
+                onError={handleImageError}
             />
 
             {/* Controls */}

@@ -1,6 +1,19 @@
 import { useState } from "react";
 import ImageModal from "./ImageModal";
 
+const FALLBACK_IMAGE_SRC = "/fallback.jpg";
+
+function handleImageError(event) {
+    const target = event.currentTarget;
+
+    if (target.dataset.fallbackApplied === "true") {
+        return;
+    }
+
+    target.dataset.fallbackApplied = "true";
+    target.src = FALLBACK_IMAGE_SRC;
+}
+
 export default function ImageGallery({ mainImage, images }) {
     // Merge images so mainImage is always first, keeping unique values
     const allImages = Array.from(new Set([mainImage, ...(images || [])].filter(Boolean)));
@@ -32,6 +45,7 @@ export default function ImageGallery({ mainImage, images }) {
                     alt="Site view main"
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     onClick={() => openModal(0)}
+                    onError={handleImageError}
                 />
                 {modalOpen && (
                     <ImageModal
@@ -59,6 +73,7 @@ export default function ImageGallery({ mainImage, images }) {
                     src={heroImage}
                     alt="Hero view"
                     className="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-105"
+                    onError={handleImageError}
                 />
                 <div className="absolute inset-0 bg-black/10 transition-opacity duration-300 group-hover/container:opacity-100 opacity-0 group-hover/item:opacity-0" />
             </div>
@@ -77,6 +92,7 @@ export default function ImageGallery({ mainImage, images }) {
                                 alt={`Gallery view ${absoluteIndex}`}
                                 loading="lazy"
                                 className="w-full h-full object-cover transition-transform duration-700 group-hover/item:scale-105"
+                                onError={handleImageError}
                             />
 
                             {/* Dim inactive grid items on hover */}

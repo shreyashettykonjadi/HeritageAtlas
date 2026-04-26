@@ -1,11 +1,12 @@
 import { useParams, Link } from "react-router-dom"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useAuth } from "../context/AuthContext"
 import { getCategoryBadge } from "../constants/categories"
 import useSite from "../hooks/useSite"
 import useSiteProgress from "../hooks/useSiteProgress"
 import ProgressSection from "../components/ProgressSection"
 import ImageGallery from "../components/ImageGallery"
+import { fetchWikimediaImages } from "../utils/fetchWikimediaImages"
 
 function trimToWordBoundary(text, maxLength) {
   if (!text || text.length <= maxLength) {
@@ -17,6 +18,19 @@ function trimToWordBoundary(text, maxLength) {
   return lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated
 }
 
+function shuffleArray(values) {
+  const shuffled = [...values]
+
+  for (let i = shuffled.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1))
+    const temp = shuffled[i]
+    shuffled[i] = shuffled[j]
+    shuffled[j] = temp
+  }
+
+  return shuffled
+}
+
 
 export default function PlaceDetail() {
   const { slug } = useParams()
@@ -24,10 +38,47 @@ export default function PlaceDetail() {
   const { site, loading: loadingSite, error: siteError } = useSite(slug);
   const progress = useSiteProgress(slug);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [images, setImages] = useState([]);
   const fallbackText = `${site?.name} is a UNESCO World Heritage site in ${site?.country} known for its ${site?.category?.toLowerCase()} significance.`;
   const cleanDescription = site?.shortDescription ||
     (site?.description ? (site.description.length > 350 ? trimToWordBoundary(site.description, 350) + "..." : site.description) : null) ||
     fallbackText;
+
+  useEffect(function () {
+    let isCancelled = false;
+
+    async function loadImages() {
+      if (!site) {
+        setImages([]);
+        return;
+      }
+
+      const query = `${site.name} ${site.country} monument`;
+      const wikiImages = await fetchWikimediaImages(query);
+      console.log("Wikimedia images:", wikiImages);
+
+      const combined = [...wikiImages];
+
+      const uniqueImages = Array.from(new Set(combined.filter(Boolean)));
+      const shuffledImages = shuffleArray(uniqueImages);
+
+      if (!isCancelled) {
+        setImages(shuffledImages);
+      }
+    }
+
+    loadImages();
+
+    return function () {
+      isCancelled = true;
+    };
+  }, [site]);
+
+  const mainImage = images.length > 0
+    ? images[Math.floor(Math.random() * images.length)]
+    : "/fallback.jpg";
+
+  const galleryImages = images.slice(0, 6);
 
   function handleStatusChange(newStatus) {
     // Auth-gate: prompt login when user tries to mark visited/bucket
@@ -114,7 +165,7 @@ export default function PlaceDetail() {
           {site.name}
         </h1>
 
-        <ImageGallery mainImage={site.mainImage} images={site.images} />
+        <ImageGallery mainImage={mainImage} images={galleryImages} />
       </div>
 
       {/* Content Container */}
