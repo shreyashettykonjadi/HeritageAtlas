@@ -19,6 +19,7 @@ export default function MapPage() {
   var mapRef = useRef(null)
   var markersRef = useRef(null)
 
+  // Create a lookup for quick access to user's progress by site slug
   var progressMap = useMemo(function () {
     var map = {};
     progressData.forEach(function (record) {
@@ -29,10 +30,12 @@ export default function MapPage() {
     return map;
   }, [progressData]);
 
+  // Count how many sites are endangered (for display in the toggle)
   var dangerCount = useMemo(function () {
     return sites.filter(function (s) { return s.danger; }).length;
   }, [sites]);
 
+  // Fetch sites on mount
   useEffect(function fetchSites() {
     async function load() {
       setLoadingSites(true);
@@ -48,6 +51,7 @@ export default function MapPage() {
     load();
   }, [])
 
+  // Initialize the map on mount and clean up on unmount
   useEffect(function initMap() {
     var southWest = L.latLng(-85, -180)
     var northEast = L.latLng(85, 180)
@@ -81,6 +85,7 @@ export default function MapPage() {
     return function () { map.remove() }
   }, [])
 
+  // Toggle map interactions based on whether a site is selected
   useEffect(function toggleInteractions() {
     if (!mapRef.current) return
     if (selectedSite) {
@@ -90,6 +95,7 @@ export default function MapPage() {
     }
   }, [selectedSite])
 
+  // Render markers whenever sites, progress, map mode, or danger filter changes
   useEffect(function renderMarkers() {
     if (!markersRef.current) return
     markersRef.current.clearLayers()
@@ -124,6 +130,7 @@ export default function MapPage() {
     })
   }, [mapMode, progressMap, sites, showDanger])
 
+  // Helper to enable/disable map interactions
   function setMapInteraction(map, enabled) {
     if (!map) return
     var methods = ["dragging", "scrollWheelZoom", "doubleClickZoom", "boxZoom", "keyboard", "touchZoom"];

@@ -4,7 +4,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "seed:unesco": "node scripts/seedUnesco.js",
+    "enrich:images": "node scripts/enrichImages.js"
   },
   "keywords": [],
   "author": "Shreya Shetty",

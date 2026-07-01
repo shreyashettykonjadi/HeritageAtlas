@@ -8,7 +8,11 @@ const connectDB = async () => {
       throw new Error("MONGO_URI not defined");
     }
 
-    await mongoose.connect(mongoURI);
+    const dbName = process.env.MONGO_DB_NAME || "heritage-map-db";
+
+    await mongoose.connect(mongoURI, {
+      dbName,
+    });
 
     console.log("MongoDB connected");
   } catch (error) {

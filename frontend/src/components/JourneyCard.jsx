@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
 import { getCategoryBadge } from "../constants/categories";
 import { isValidSlug, toSafeSlugSegment } from "../utils/slug";
+import { getImageUrl } from "../utils/image";
 
 export default function JourneyCard({ record, onEdit, onDelete }) {
   const { site, rating, visitDate } = record;
-  const image = site.mainImage || (site.images && site.images[0]) || null;
+  const image = getImageUrl(site?.mainImage) || getImageUrl(site?.galleryImages?.[0]) || null;
   const safeSlugSegment = toSafeSlugSegment(site?.slug);
   const placePath = safeSlugSegment ? `/place/${safeSlugSegment}` : "/";
 

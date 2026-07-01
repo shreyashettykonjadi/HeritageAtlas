@@ -100,13 +100,13 @@ export async function getUserProgress(req, res) {
   const userId = req.user._id;
 
   const progress = await UserProgress.find({ user: userId })
-    .populate("site", "slug name category country mainImage images")
+    .populate("site", "slug name category country mainImage galleryImages")
     .sort({ updatedAt: -1 });
 
   const mapped = progress.map(function (doc) {
     const obj = doc.toObject();
     if (obj.site) {
-      obj.site.images = obj.site.images?.slice(0, IMAGE_PREVIEW_LIMIT) || [];
+      obj.site.galleryImages = obj.site.galleryImages?.slice(0, IMAGE_PREVIEW_LIMIT) || [];
     }
     return obj;
   });

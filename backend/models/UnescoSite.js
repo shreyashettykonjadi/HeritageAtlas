@@ -72,11 +72,40 @@ const unescoSiteSchema = new mongoose.Schema(
       },
     },
     mainImage: {
-      type: String,
+      originalUrl: {
+        type: String,
+        trim: true,
+      },
+      source: {
+        type: String,
+        default: "unesco",
+      },
     },
-    images: {
-      type: [String],
+    galleryImages: {
+      type: [
+        {
+          originalUrl: {
+            type: String,
+            trim: true,
+          },
+          title: {
+            type: String,
+            trim: true,
+          },
+          attribution: {
+            type: String,
+            trim: true,
+          },
+          source: {
+            type: String,
+            default: "wikimedia",
+          },
+        },
+      ],
       default: [],
+    },
+    imagesLastUpdated: {
+      type: Date,
     },
   },
   { timestamps: true }

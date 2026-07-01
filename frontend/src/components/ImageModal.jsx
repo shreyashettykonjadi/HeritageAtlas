@@ -80,7 +80,7 @@ export default function ImageModal({ images, currentIndex, onClose, onNavigate }
                             onNavigate("prev"); 
                         }}
                         className="absolute left-6 top-1/2 -translate-y-1/2 p-3 text-white/50 hover:text-white bg-black/20 hover:bg-black/50 rounded-full transition-all border border-transparent hover:border-white/20 backdrop-blur-md pointer-events-auto hover:scale-110 duration-200"
-                        title="Previous image (← arrow)"
+                        title="Previous image (left arrow)"
                     >
                         <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19l-7-7 7-7" />
@@ -94,7 +94,7 @@ export default function ImageModal({ images, currentIndex, onClose, onNavigate }
                             onNavigate("next"); 
                         }}
                         className="absolute right-6 top-1/2 -translate-y-1/2 p-3 text-white/50 hover:text-white bg-black/20 hover:bg-black/50 rounded-full transition-all border border-transparent hover:border-white/20 backdrop-blur-md pointer-events-auto hover:scale-110 duration-200"
-                        title="Next image (→ arrow)"
+                        title="Next image (right arrow)"
                     >
                         <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
@@ -106,7 +106,7 @@ export default function ImageModal({ images, currentIndex, onClose, onNavigate }
             {/* Bottom: Keyboard hints */}
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/40 text-xs font-medium tracking-wider pointer-events-none">
                 <span className="inline-block bg-black/30 px-3 py-1.5 rounded-full backdrop-blur-md border border-white/5">
-                    Use ← → arrows to navigate • ESC to close
+                    Use left and right arrows to navigate, ESC to close
                 </span>
             </div>
         </div>

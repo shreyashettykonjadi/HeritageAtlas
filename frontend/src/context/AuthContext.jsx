@@ -26,6 +26,7 @@ const AUTH_MESSAGES = {
     },
 };
 
+// Auth context provider that manages user state, session checking, and provides a requireAuth function for components to trigger login when needed.
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [authLoading, setAuthLoading] = useState(true);
@@ -97,6 +98,7 @@ export function AuthProvider({ children }) {
         }
     }, [pendingAction]);
 
+    // Close the auth modal and clear any pending action
     const closeAuthModal = useCallback(function () {
         setAuthModalOpen(false);
         setPendingAction(null);
@@ -133,6 +135,7 @@ export function AuthProvider({ children }) {
     );
 }
 
+// Custom hook to access auth context, ensuring it's used within the provider.
 export function useAuth() {
     const context = useContext(AuthContext);
     if (!context) {

@@ -8,6 +8,8 @@ import MyJourney from "./pages/MyJourney.jsx"
 import Login from "./pages/Login.jsx"
 import Register from "./pages/Register.jsx"
 
+
+//AppRoutes component handles the routing and conditional rendering based on authentication loading state.
 function AppRoutes() {
   const { authLoading } = useAuth()
 

@@ -4,6 +4,40 @@ import fs from "fs";
 import path from "path";
 import UnescoSite from "../models/UnescoSite.js";
 
+function isHttpUrl(value) {
+  return typeof value === "string" && /^https?:\/\//i.test(value.trim());
+}
+
+function normalizeMainImage(mainImage) {
+  if (mainImage && typeof mainImage === "object") {
+    const originalUrl = typeof mainImage.originalUrl === "string" ? mainImage.originalUrl.trim() : "";
+    if (isHttpUrl(originalUrl)) {
+      return {
+        originalUrl,
+        source: mainImage.source || "unesco",
+      };
+    }
+  }
+
+  if (typeof mainImage === "string" && isHttpUrl(mainImage)) {
+    return {
+      originalUrl: mainImage.trim(),
+      source: "unesco",
+    };
+  }
+
+  return null;
+}
+
+function normalizeSite(record) {
+  return {
+    ...record,
+    mainImage: normalizeMainImage(record.mainImage),
+    galleryImages: [],
+    imagesLastUpdated: null,
+  };
+}
+
 async function seed() {
   try {
     const mongoUri = process.env.MONGO_URI;
@@ -24,7 +58,8 @@ async function seed() {
     await UnescoSite.deleteMany({});
     console.log("Cleared existing UnescoSite documents");
 
-    const result = await UnescoSite.insertMany(sites);
+    const normalizedSites = sites.map(normalizeSite);
+    const result = await UnescoSite.insertMany(normalizedSites);
     console.log("Inserted:", result.length);
 
     await mongoose.connection.close();
