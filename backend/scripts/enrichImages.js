@@ -3,6 +3,10 @@ import mongoose from "mongoose";
 import connectDB from "../config/db.js";
 import UnescoSite from "../models/UnescoSite.js";
 
+function isHttpUrl(value) {
+  return typeof value === "string" && /^https?:\/\//i.test(value.trim());
+}
+
 const MIN_WIDTH = 640;
 const MIN_HEIGHT = 480;
 const TARGET_GALLERY_COUNT = 8;
@@ -17,10 +21,6 @@ const MIN_EXISTING_GALLERY_IMAGES = 6;
 const searchCache = new Map();
 const metadataCache = new Map();
 const wikimediaScheduler = createWikimediaScheduler();
-
-function isHttpUrl(value) {
-  return typeof value === "string" && /^https?:\/\//i.test(value.trim());
-}
 
 function isWikimediaRateLimitError(error) {
   return error?.code === "WIKIMEDIA_RATE_LIMITED";
@@ -74,7 +74,7 @@ function createWikimediaScheduler() {
         const previousInterval = currentIntervalMs;
         currentIntervalMs = Math.max(MIN_REQUEST_INTERVAL_MS, Math.floor(currentIntervalMs / 2));
         successStreak = 0;
-        console.log(`Stable again. Reducing Wikimedia interval: ${previousInterval} ms -> ${currentIntervalMs} ms`);
+        console.log(`Stable again. Reducing Wikimedia interval: ${previousInterval} ms → ${currentIntervalMs} ms`);
       }
     },
     recordRateLimit(retryAfterMs = null) {
@@ -94,7 +94,7 @@ function createWikimediaScheduler() {
       }
 
       if (previousInterval !== currentIntervalMs) {
-        console.log(`Rate limited. Increasing Wikimedia interval: ${previousInterval} ms -> ${currentIntervalMs} ms`);
+        console.log(`Rate limited. Increasing Wikimedia interval: ${previousInterval} ms → ${currentIntervalMs} ms`);
       }
     },
     getInterval() {
@@ -281,6 +281,10 @@ function firstSearchPhrase(name) {
 
   phrase = phrase.replace(/\s*\([^)]*\)\s*/g, " ").replace(/\s+/g, " ").trim();
   return phrase;
+}
+
+function getCloudinaryWidthForGallery(width, height) {
+  return 800;
 }
 
 function buildSearchTerms(site) {

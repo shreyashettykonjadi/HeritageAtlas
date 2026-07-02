@@ -88,6 +88,10 @@ const unescoSiteSchema = new mongoose.Schema(
             type: String,
             trim: true,
           },
+          thumbnailUrl: {
+            type: String,
+            trim: true,
+          },
           title: {
             type: String,
             trim: true,

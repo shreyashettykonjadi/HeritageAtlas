@@ -4,14 +4,10 @@ import fs from "fs";
 import path from "path";
 import UnescoSite from "../models/UnescoSite.js";
 
-function isHttpUrl(value) {
-  return typeof value === "string" && /^https?:\/\//i.test(value.trim());
-}
-
 function normalizeMainImage(mainImage) {
   if (mainImage && typeof mainImage === "object") {
     const originalUrl = typeof mainImage.originalUrl === "string" ? mainImage.originalUrl.trim() : "";
-    if (isHttpUrl(originalUrl)) {
+    if (originalUrl) {
       return {
         originalUrl,
         source: mainImage.source || "unesco",
@@ -19,7 +15,7 @@ function normalizeMainImage(mainImage) {
     }
   }
 
-  if (typeof mainImage === "string" && isHttpUrl(mainImage)) {
+  if (typeof mainImage === "string" && mainImage.trim()) {
     return {
       originalUrl: mainImage.trim(),
       source: "unesco",
