@@ -67,6 +67,8 @@ export default function ImageModal({ images, currentIndex, onClose, onNavigate }
                     draggable="false"
                     onError={handleImageError}
                     onClick={(e) => e.stopPropagation()}
+                    loading="eager"
+                    decoding="async"
                 />
             </div>
 

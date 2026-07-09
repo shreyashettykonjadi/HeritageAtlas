@@ -116,6 +116,9 @@ const unescoSiteSchema = new mongoose.Schema(
 );
 
 unescoSiteSchema.index({ location: "2dsphere" });
+unescoSiteSchema.index({ name: "text", country: "text", shortDescription: "text" });
+unescoSiteSchema.index({ category: 1, country: 1 });
+unescoSiteSchema.index({ danger: 1 });
 
 const UnescoSite = mongoose.model("UnescoSite", unescoSiteSchema);
 

@@ -283,10 +283,6 @@ function firstSearchPhrase(name) {
   return phrase;
 }
 
-function getCloudinaryWidthForGallery(width, height) {
-  return 800;
-}
-
 function buildSearchTerms(site) {
   const terms = [];
   const primary = cleanSearchText(site?.name);

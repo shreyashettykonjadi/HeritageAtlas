@@ -6,7 +6,9 @@
     "dev": "nodemon server.js",
     "start": "node server.js",
     "seed:unesco": "node scripts/seedUnesco.js",
-    "enrich:images": "node scripts/enrichImages.js"
+    "enrich:images": "node scripts/enrichImages.js",
+    "gallery:thumbnails": "node scripts/populateGalleryThumbnails.js",
+    "populate:thumbnails": "node scripts/populateGalleryThumbnails.js"
   },
   "keywords": [],
   "author": "Shreya Shetty",

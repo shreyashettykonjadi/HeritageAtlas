@@ -2,7 +2,6 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { getCategoryBadge } from "../constants/categories"
 import { toSafeSlugSegment } from "../utils/slug"
-import { getImageUrl } from "../utils/image"
 
 function trimToWordBoundary(text, maxLength) {
   if (!text || text.length <= maxLength) {
@@ -47,7 +46,7 @@ export default function SidePanel({ site, onClose }) {
 
 
   const categoryBadge = getCategoryBadge(site.category)
-  const heroImage = getImageUrl(site.mainImage)
+  const heroImage = site?.mainImage?.originalUrl || null
 
   return (
     <>
@@ -95,6 +94,7 @@ export default function SidePanel({ site, onClose }) {
                 src={heroImage}
                 alt={site.name}
                 loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover"
               />
             ) : (

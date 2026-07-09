@@ -1,11 +1,14 @@
 import { Link } from "react-router-dom";
 import { getCategoryBadge } from "../constants/categories";
 import { isValidSlug, toSafeSlugSegment } from "../utils/slug";
-import { getImageUrl } from "../utils/image";
+import { getDisplayImageUrl } from "../utils/image";
 
 export default function JourneyCard({ record, onEdit, onDelete }) {
   const { site, rating, visitDate } = record;
-  const image = getImageUrl(site?.mainImage) || getImageUrl(site?.galleryImages?.[0]) || null;
+  const image =
+    site?.mainImage?.originalUrl ||
+    getDisplayImageUrl(site?.galleryImages?.[0], { preferThumbnail: true }) ||
+    null;
   const safeSlugSegment = toSafeSlugSegment(site?.slug);
   const placePath = safeSlugSegment ? `/place/${safeSlugSegment}` : "/";
 
@@ -59,6 +62,8 @@ export default function JourneyCard({ record, onEdit, onDelete }) {
             src={image}
             alt={site.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+            decoding="async"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-[#1B4436]/10 to-[#1B4436]/5">

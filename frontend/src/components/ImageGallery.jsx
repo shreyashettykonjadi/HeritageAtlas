@@ -1,6 +1,6 @@
 import { useState } from "react";
 import ImageModal from "./ImageModal";
-import { getImageAlt, getImageUrl } from "../utils/image";
+import { getDisplayImageUrl, getImageAlt } from "../utils/image";
 
 const FALLBACK_IMAGE_SRC = "/fallback.jpg";
 const INITIAL_LOAD = 4;
@@ -39,7 +39,7 @@ function SitePlaceholder() {
 }
 
 function normalizeImageEntry(entry) {
-  const url = getImageUrl(entry);
+  const url = getDisplayImageUrl(entry);
   if (!url) {
     return null;
   }
@@ -53,7 +53,17 @@ function normalizeImageEntry(entry) {
 export default function ImageGallery({ site, mainImage, images, isLoading = false }) {
   const heroImage = normalizeImageEntry(site?.mainImage || mainImage);
   const galleryEntries = (site?.galleryImages || images || [])
-    .map(normalizeImageEntry)
+    .map((entry) => {
+      const url = getDisplayImageUrl(entry, { preferThumbnail: true });
+      if (!url) {
+        return null;
+      }
+
+      return {
+        url,
+        alt: getImageAlt(entry, "Heritage site image"),
+      };
+    })
     .filter(Boolean)
     .filter((entry) => entry.url !== heroImage?.url);
 
@@ -114,6 +124,8 @@ export default function ImageGallery({ site, mainImage, images, isLoading = fals
             onError={handleImageError}
             onLoad={() => handleImageLoad(0)}
             loading="eager"
+            decoding="async"
+            fetchPriority="high"
           />
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300" />
         </div>

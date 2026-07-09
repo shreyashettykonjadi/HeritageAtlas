@@ -1,4 +1,4 @@
-export function getImageUrl(image) {
+export function getDisplayImageUrl(image, { preferThumbnail = false } = {}) {
   if (!image) {
     return null;
   }
@@ -8,6 +8,10 @@ export function getImageUrl(image) {
   }
 
   if (typeof image === "object") {
+    if (preferThumbnail) {
+      return image.thumbnailUrl || image.originalUrl || null;
+    }
+
     return image.originalUrl || null;
   }
 
