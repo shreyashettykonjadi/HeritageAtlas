@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
+import { connectRedis } from "./config/redis.js";
 import authRoutes from "./routes/auth.routes.js";
 import progressRoutes from "./routes/progress.routes.js";
 import siteRoutes from "./routes/site.routes.js";
@@ -69,6 +70,7 @@ app.use(errorMiddleware);
 async function startServer() {
   try {
     await connectDB();
+    await connectRedis();
 
     app.listen(PORT, function () {
       console.log("Server running on port " + PORT);
